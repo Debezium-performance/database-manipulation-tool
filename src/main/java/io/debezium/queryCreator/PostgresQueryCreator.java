@@ -7,10 +7,9 @@ package io.debezium.queryCreator;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import io.debezium.DatabaseColumn;
+import io.debezium.DatabaseTableMetadata;
 import org.jboss.logging.Logger;
-
-import io.debezium.model.DatabaseColumn;
-import io.debezium.model.DatabaseTableMetadata;
 
 @ApplicationScoped
 public class PostgresQueryCreator extends AbstractBasicQueryCreator {

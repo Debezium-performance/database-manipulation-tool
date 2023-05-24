@@ -11,15 +11,15 @@ import java.util.function.Consumer;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 
+import io.debezium.DatabaseColumn;
+import io.debezium.DatabaseEntry;
+import io.debezium.DatabaseTableMetadata;
 import org.jboss.logging.Logger;
 
 import io.debezium.dao.Dao;
 import io.debezium.dao.DaoManager;
 import io.debezium.exception.InnerDatabaseException;
 import io.debezium.model.Database;
-import io.debezium.model.DatabaseColumn;
-import io.debezium.model.DatabaseEntry;
-import io.debezium.model.DatabaseTableMetadata;
 
 @RequestScoped
 public class MainService {

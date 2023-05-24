@@ -7,9 +7,9 @@ package io.debezium.dao;
 
 import java.util.List;
 
-import io.debezium.model.DatabaseColumn;
-import io.debezium.model.DatabaseEntry;
-import io.debezium.model.DatabaseTableMetadata;
+import io.debezium.DatabaseColumn;
+import io.debezium.DatabaseEntry;
+import io.debezium.DatabaseTableMetadata;
 
 public interface Dao {
 

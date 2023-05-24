@@ -12,6 +12,9 @@ import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import io.debezium.DatabaseColumn;
+import io.debezium.DatabaseEntry;
+import io.debezium.DatabaseTableMetadata;
 import org.jboss.logging.Logger;
 
 import io.debezium.exception.InnerDatabaseException;

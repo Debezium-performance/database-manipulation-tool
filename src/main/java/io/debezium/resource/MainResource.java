@@ -17,10 +17,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.debezium.DatabaseEntry;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
-import io.debezium.model.DatabaseEntry;
 import io.debezium.service.MainService;
 import io.debezium.utils.DatabaseEntryParser;
 import io.quarkus.runtime.StartupEvent;

@@ -7,12 +7,11 @@ package io.debezium.queryCreator;
 
 import java.util.List;
 
+import io.debezium.DatabaseColumn;
+import io.debezium.DatabaseColumnEntry;
+import io.debezium.DatabaseEntry;
+import io.debezium.DatabaseTableMetadata;
 import org.jboss.logging.Logger;
-
-import io.debezium.model.DatabaseColumn;
-import io.debezium.model.DatabaseColumnEntry;
-import io.debezium.model.DatabaseEntry;
-import io.debezium.model.DatabaseTableMetadata;
 
 public abstract class AbstractBasicQueryCreator implements QueryCreator {
 

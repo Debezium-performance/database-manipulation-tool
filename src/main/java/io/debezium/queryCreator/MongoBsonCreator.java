@@ -9,13 +9,12 @@ import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import io.debezium.DatabaseEntry;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.jboss.logging.Logger;
 
 import com.mongodb.client.model.Updates;
-
-import io.debezium.model.DatabaseEntry;
 
 @ApplicationScoped
 public class MongoBsonCreator {

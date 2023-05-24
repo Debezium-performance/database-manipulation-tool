@@ -6,11 +6,14 @@
 package io.debezium.dao;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 
+import io.debezium.DatabaseColumn;
+import io.debezium.DatabaseColumnEntry;
+import io.debezium.DatabaseEntry;
+import io.debezium.DatabaseTableMetadata;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -21,10 +24,6 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 
-import io.debezium.model.DatabaseColumn;
-import io.debezium.model.DatabaseColumnEntry;
-import io.debezium.model.DatabaseEntry;
-import io.debezium.model.DatabaseTableMetadata;
 import io.debezium.queryCreator.MongoBsonCreator;
 import io.quarkus.arc.Unremovable;
 import io.quarkus.arc.lookup.LookupIfProperty;

@@ -12,13 +12,13 @@ import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
 
+import io.debezium.DatabaseColumn;
+import io.debezium.DatabaseEntry;
+import io.debezium.DatabaseTableMetadata;
 import org.jboss.logging.Logger;
 
 import io.debezium.dataSource.DataSourceWrapper;
 import io.debezium.exception.RuntimeSQLException;
-import io.debezium.model.DatabaseColumn;
-import io.debezium.model.DatabaseEntry;
-import io.debezium.model.DatabaseTableMetadata;
 import io.debezium.queryCreator.QueryCreator;
 
 @SuppressWarnings("CdiManagedBeanInconsistencyInspection")

@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import io.debezium.DatabaseColumnEntry;
+import io.debezium.DatabaseEntry;
+import io.debezium.DatabaseTableMetadata;
 import org.jboss.logging.Logger;
 
 import io.debezium.exception.InnerDatabaseException;

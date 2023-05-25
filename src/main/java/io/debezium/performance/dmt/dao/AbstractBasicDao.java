@@ -16,10 +16,10 @@ import org.jboss.logging.Logger;
 
 import io.debezium.performance.dmt.dataSource.DataSourceWrapper;
 import io.debezium.performance.dmt.exception.RuntimeSQLException;
+import io.debezium.performance.dmt.model.DatabaseColumn;
+import io.debezium.performance.dmt.model.DatabaseEntry;
+import io.debezium.performance.dmt.model.DatabaseTableMetadata;
 import io.debezium.performance.dmt.queryCreator.QueryCreator;
-import io.debezium.performance.dmt.schema.DatabaseColumn;
-import io.debezium.performance.dmt.schema.DatabaseEntry;
-import io.debezium.performance.dmt.schema.DatabaseTableMetadata;
 
 @SuppressWarnings("CdiManagedBeanInconsistencyInspection")
 @RequestScoped

@@ -20,11 +20,11 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 
+import io.debezium.performance.dmt.model.DatabaseColumn;
+import io.debezium.performance.dmt.model.DatabaseColumnEntry;
+import io.debezium.performance.dmt.model.DatabaseEntry;
+import io.debezium.performance.dmt.model.DatabaseTableMetadata;
 import io.debezium.performance.dmt.queryCreator.MongoBsonCreator;
-import io.debezium.performance.dmt.schema.DatabaseColumn;
-import io.debezium.performance.dmt.schema.DatabaseColumnEntry;
-import io.debezium.performance.dmt.schema.DatabaseEntry;
-import io.debezium.performance.dmt.schema.DatabaseTableMetadata;
 import io.quarkus.arc.Unremovable;
 import io.quarkus.arc.lookup.LookupIfProperty;
 import io.quarkus.mongodb.MongoClientName;

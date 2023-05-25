@@ -80,11 +80,6 @@
       <artifactId>quarkus-micrometer-registry-prometheus</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.debezium.performance</groupId>
-      <artifactId>dmt-schema</artifactId>
-      <version>0.0.2-SNAPSHOT</version>
-    </dependency>
-    <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-junit5</artifactId>
       <scope>test</scope>
@@ -189,14 +184,14 @@
         </property>
       </activation>
       <dependencies>
-<!--        <dependency>-->
-<!--          <groupId>io.quarkus</groupId>-->
-<!--          <artifactId>quarkus-kubernetes</artifactId>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--          <groupId>io.quarkus</groupId>-->
-<!--          <artifactId>quarkus-kubernetes-config</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-kubernetes</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-kubernetes-config</artifactId>
+        </dependency>
       </dependencies>
       <properties>
         <skipITs>false</skipITs>

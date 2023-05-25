@@ -9,8 +9,8 @@ import javax.enterprise.context.ApplicationScoped;
 
 import org.jboss.logging.Logger;
 
-import io.debezium.performance.dmt.schema.DatabaseColumn;
-import io.debezium.performance.dmt.schema.DatabaseTableMetadata;
+import io.debezium.performance.dmt.model.DatabaseColumn;
+import io.debezium.performance.dmt.model.DatabaseTableMetadata;
 
 @ApplicationScoped
 public class PostgresQueryCreator extends AbstractBasicQueryCreator {

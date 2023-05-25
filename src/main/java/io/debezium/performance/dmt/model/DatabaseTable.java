@@ -13,9 +13,6 @@ import java.util.Map;
 import org.jboss.logging.Logger;
 
 import io.debezium.performance.dmt.exception.InnerDatabaseException;
-import io.debezium.performance.dmt.schema.DatabaseColumnEntry;
-import io.debezium.performance.dmt.schema.DatabaseEntry;
-import io.debezium.performance.dmt.schema.DatabaseTableMetadata;
 
 public class DatabaseTable {
     private Map<String, DatabaseEntry> rows;

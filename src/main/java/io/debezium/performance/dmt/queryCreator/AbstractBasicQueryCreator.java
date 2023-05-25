@@ -9,10 +9,10 @@ import java.util.List;
 
 import org.jboss.logging.Logger;
 
-import io.debezium.performance.dmt.schema.DatabaseColumn;
-import io.debezium.performance.dmt.schema.DatabaseColumnEntry;
-import io.debezium.performance.dmt.schema.DatabaseEntry;
-import io.debezium.performance.dmt.schema.DatabaseTableMetadata;
+import io.debezium.performance.dmt.model.DatabaseColumn;
+import io.debezium.performance.dmt.model.DatabaseColumnEntry;
+import io.debezium.performance.dmt.model.DatabaseEntry;
+import io.debezium.performance.dmt.model.DatabaseTableMetadata;
 
 public abstract class AbstractBasicQueryCreator implements QueryCreator {
 

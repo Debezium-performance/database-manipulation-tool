@@ -15,7 +15,7 @@ import org.jboss.logging.Logger;
 
 import com.mongodb.client.model.Updates;
 
-import io.debezium.performance.dmt.schema.DatabaseEntry;
+import io.debezium.performance.dmt.model.DatabaseEntry;
 
 @ApplicationScoped
 public class MongoBsonCreator {

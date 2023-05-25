@@ -15,9 +15,6 @@ import javax.enterprise.context.ApplicationScoped;
 import org.jboss.logging.Logger;
 
 import io.debezium.performance.dmt.exception.InnerDatabaseException;
-import io.debezium.performance.dmt.schema.DatabaseColumn;
-import io.debezium.performance.dmt.schema.DatabaseEntry;
-import io.debezium.performance.dmt.schema.DatabaseTableMetadata;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.prometheus.PrometheusMeterRegistry;

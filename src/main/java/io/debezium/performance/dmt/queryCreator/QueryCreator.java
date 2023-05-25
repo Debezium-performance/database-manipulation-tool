@@ -7,9 +7,9 @@ package io.debezium.performance.dmt.queryCreator;
 
 import java.util.List;
 
-import io.debezium.performance.dmt.schema.DatabaseColumn;
-import io.debezium.performance.dmt.schema.DatabaseEntry;
-import io.debezium.performance.dmt.schema.DatabaseTableMetadata;
+import io.debezium.performance.dmt.model.DatabaseColumn;
+import io.debezium.performance.dmt.model.DatabaseEntry;
+import io.debezium.performance.dmt.model.DatabaseTableMetadata;
 
 public interface QueryCreator {
     String insertQuery(DatabaseEntry databaseEntry);

@@ -13,10 +13,10 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 
 import io.debezium.performance.dmt.model.Database;
+import io.debezium.performance.dmt.model.DatabaseColumn;
+import io.debezium.performance.dmt.model.DatabaseColumnEntry;
+import io.debezium.performance.dmt.model.DatabaseEntry;
 import io.debezium.performance.dmt.model.DatabaseTable;
-import io.debezium.performance.dmt.schema.DatabaseColumn;
-import io.debezium.performance.dmt.schema.DatabaseColumnEntry;
-import io.debezium.performance.dmt.schema.DatabaseEntry;
 
 public class ResponseJsonBuilder {
     JsonObjectBuilder mainBuilder;

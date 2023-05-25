@@ -17,9 +17,9 @@ import io.debezium.performance.dmt.dao.Dao;
 import io.debezium.performance.dmt.dao.DaoManager;
 import io.debezium.performance.dmt.exception.InnerDatabaseException;
 import io.debezium.performance.dmt.model.Database;
-import io.debezium.performance.dmt.schema.DatabaseColumn;
-import io.debezium.performance.dmt.schema.DatabaseEntry;
-import io.debezium.performance.dmt.schema.DatabaseTableMetadata;
+import io.debezium.performance.dmt.model.DatabaseColumn;
+import io.debezium.performance.dmt.model.DatabaseEntry;
+import io.debezium.performance.dmt.model.DatabaseTableMetadata;
 
 @RequestScoped
 public class MainService {

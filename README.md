@@ -18,18 +18,25 @@ This is currently in alpha state so there are not many features completed and th
 ## Json insertion schema
 ```
 {
-	"databases": ["db2", "postgresql", "mysql", "mongo"],
-	"table": "pepici",
-	"primary": "name",
-	"payload": [{
-            "name": "name",
+    "databaseTable": {
+        "name": "pepici",
+        "primary": "name"
+    },
+    "columnEntries": [
+        {
+            "columnName": "name",
             "dataType": "VarChar(255)",
-            "value": "PepaZDepa"
+            "value": "PepaZDepa5"
         },
         {
-            "name": "age",
+            "columnName": "age",
             "dataType": "Integer",
-            "value": "20"
+            "value": "30"
+        },
+        {
+            "columnName": "money",
+            "dataType": "Double",
+            "value": "15.5"
         }
     ]
 }
@@ -38,9 +45,7 @@ This is currently in alpha state so there are not many features completed and th
 It is imperative to use the primary key so that the created tables can have primary key and can be correctly updated.
 Primary keys must always be unique and once set cannot be changed. Therefore, I recommend using GUID or other system that ensures these properties.
 
-When Creating tables, the `payload` value determines the columns and their types.
-
-You can enable/disable different databases with the `enabled` property. The database insertion filtering based on json key `databases` is not implemented yet. Every enabled database will try to execute the command.
+When Creating tables, the `columnEntries` value determines the columns and their types.
 
 You can reset all databases on DMT start with property `onstart.reset.database`.
 
@@ -50,10 +55,11 @@ You can reset all databases on DMT start with property `onstart.reset.database`.
 <summary><code>POST</code> <code><b>/Main/CreateTable</b></code> <code>(Creates table/collection in every enabled database)</code></summary>
 <summary><code>POST</code> <code><b>/Main/CreateTableAndUpsert</b></code> <code>(Upserts json into all databases and creates tables if they did not exist or adds columns so the json can be upserted)</code></summary>
 <summary><code>DELETE</code> <code><b>/Main/DropTable</b></code> <code>(Drops table/collection in every enabled database)</code></summary>
-<summary><code>DELETE</code> <code><b>/Main/ResetDatabase</b></code> <code>(Drops all databases/schemas and creates them again)</code></summary>
+<summary><code>GET</code> <code><b>/Main/ResetDatabase</b></code> <code>(Drops all databases/schemas and creates them again)</code></summary>
 
 <br />
 <summary><code>GET</code> <code><b>/Utility/GetAll</b></code> <code>(Gets all created tables and their current state)</code></summary>
+<summary><code>POST</code> <code><b>/Utility/TestSchema</b></code> <code>(Gets all created tables and their current state)</code></summary>
 
 
 ## Running the application in dev mode

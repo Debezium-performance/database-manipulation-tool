@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import javax.json.JsonObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -23,7 +24,6 @@ import org.jboss.logging.Logger;
 
 import io.debezium.performance.dmt.model.DatabaseEntry;
 import io.debezium.performance.dmt.service.MainService;
-import io.debezium.performance.dmt.utils.DatabaseEntryParser;
 import io.quarkus.runtime.StartupEvent;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
@@ -104,7 +104,7 @@ public class MainResource {
     }
 
     @Path("ResetDatabase")
-    @DELETE
+    @GET
     public Response resetDatabase() {
         LOG.debug("Received RESET DATABASE request");
         try {

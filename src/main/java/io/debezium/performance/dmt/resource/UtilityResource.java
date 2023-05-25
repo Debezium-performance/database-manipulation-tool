@@ -53,7 +53,7 @@ public class UtilityResource {
         }
     }
 
-    @Path("SchemaTest")
+    @Path("TestSchema")
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
     public Response parseTest(JsonObject inputJsonObj) {

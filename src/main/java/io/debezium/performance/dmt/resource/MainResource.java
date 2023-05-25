@@ -17,6 +17,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.debezium.performance.dmt.utils.DmtSchemaParser;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
@@ -37,7 +38,7 @@ public class MainResource {
     MainService mainService;
 
     @Inject
-    DatabaseEntryParser parser;
+    DmtSchemaParser parser;
 
     @ConfigProperty(name = "onstart.reset.database", defaultValue = "false")
     boolean resetDatabase;
@@ -121,5 +122,4 @@ public class MainResource {
             mainService.resetDatabase();
         }
     }
-
 }

@@ -6,8 +6,7 @@
 package io.debezium.performance.dmt.utils;
 
 import javax.json.JsonException;
-import javax.json.JsonObject;
 
-public interface DataParser<T> {
-    T parse(JsonObject inputJsonObject) throws JsonException;
+public interface DataParser<T, E> {
+    T parse(E inputObject) throws JsonException;
 }

@@ -22,6 +22,7 @@ import io.debezium.performance.dmt.model.DatabaseEntry;
 import io.debezium.performance.dmt.model.DatabaseTableMetadata;
 import io.debezium.performance.dmt.service.MainService;
 
+@Deprecated
 @ApplicationScoped
 public class DatabaseEntryParser implements DataParser<DatabaseEntry, JsonObject> {
 

@@ -19,10 +19,8 @@ This is currently in alpha state so there are not many features completed and th
 The Json schema is `DatabaseEntry` class from the DMT-schema project.  
 ```
 {
-    "databaseTable": {
-        "name": "pepici",
-        "primary": "name"
-    },
+    "name": "pepici",
+    "primary": "name",
     "columnEntries": [
         {
             "columnName": "name",

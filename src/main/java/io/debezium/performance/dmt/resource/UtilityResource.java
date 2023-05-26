@@ -16,11 +16,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.debezium.performance.dmt.model.DatabaseEntry;
-import io.debezium.performance.dmt.utils.DmtSchemaParser;
 import org.jboss.logging.Logger;
 
+import io.debezium.performance.dmt.model.DatabaseEntry;
 import io.debezium.performance.dmt.service.UtilityService;
+import io.debezium.performance.dmt.utils.DmtSchemaParser;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @Path("Utility")
@@ -63,6 +63,7 @@ public class UtilityResource {
             return Response.ok().entity("DMT schema is correct").build();
         }
         catch (Exception ex) {
+            LOG.debug("Received DMT schema is incorrect");
             return Response.noContent().status(Response.Status.INTERNAL_SERVER_ERROR).entity("ERROR - DMT schema is incorrect").build();
         }
     }

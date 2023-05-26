@@ -5,19 +5,22 @@
  */
 package io.debezium.performance.dmt.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.json.JsonException;
+import javax.json.JsonObject;
+
+import org.jboss.logging.Logger;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.debezium.performance.dmt.model.DatabaseColumn;
 import io.debezium.performance.dmt.model.DatabaseColumnEntry;
 import io.debezium.performance.dmt.model.DatabaseEntry;
 import io.debezium.performance.dmt.model.DatabaseTableMetadata;
 import io.debezium.performance.dmt.service.MainService;
-import org.jboss.logging.Logger;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.json.JsonException;
-import javax.json.JsonObject;
-import java.util.ArrayList;
-import java.util.List;
 
 @ApplicationScoped
 public class DmtSchemaParser implements DataParser<DatabaseEntry, JsonObject> {
@@ -35,8 +38,8 @@ public class DmtSchemaParser implements DataParser<DatabaseEntry, JsonObject> {
             List<DatabaseColumnEntry> entries = new ArrayList<>();
             DatabaseTableMetadata table = new DatabaseTableMetadata();
 
-            table.setName(schemaEntry.getDatabaseTable().getName());
-            String primary = schemaEntry.getDatabaseTable().getPrimary();
+            table.setName(schemaEntry.getName());
+            String primary = schemaEntry.getPrimary();
 
             for (var databaseColumnEntry : schemaEntry.getColumnEntries()) {
                 DatabaseColumnEntry entry = new DatabaseColumnEntry(databaseColumnEntry.value(), databaseColumnEntry.columnName(), databaseColumnEntry.dataType());

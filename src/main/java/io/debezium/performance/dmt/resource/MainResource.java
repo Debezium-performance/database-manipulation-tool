@@ -18,12 +18,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.debezium.performance.dmt.utils.DmtSchemaParser;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
 import io.debezium.performance.dmt.model.DatabaseEntry;
 import io.debezium.performance.dmt.service.MainService;
+import io.debezium.performance.dmt.utils.DmtSchemaParser;
 import io.quarkus.runtime.StartupEvent;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 

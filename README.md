@@ -16,6 +16,7 @@ This is currently in alpha state so there are not many features completed and th
 | Reset Database        	         | X	         | 	X      | X	      | 	        | 	           | 	     |
 
 ## Json insertion schema
+The Json schema is `DatabaseEntry` class from the DMT-schema project.  
 ```
 {
     "databaseTable": {
@@ -59,7 +60,7 @@ You can reset all databases on DMT start with property `onstart.reset.database`.
 
 <br />
 <summary><code>GET</code> <code><b>/Utility/GetAll</b></code> <code>(Gets all created tables and their current state)</code></summary>
-<summary><code>POST</code> <code><b>/Utility/TestSchema</b></code> <code>(Gets all created tables and their current state)</code></summary>
+<summary><code>POST</code> <code><b>/Utility/TestSchema</b></code> <code>(Test if the input json schema is correct)</code></summary>
 
 
 ## Running the application in dev mode

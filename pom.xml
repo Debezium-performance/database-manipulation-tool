@@ -189,15 +189,27 @@
         </property>
       </activation>
       <dependencies>
-<!--        <dependency>-->
-<!--          <groupId>io.quarkus</groupId>-->
-<!--          <artifactId>quarkus-kubernetes</artifactId>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--          <groupId>io.quarkus</groupId>-->
-<!--          <artifactId>quarkus-kubernetes-config</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-kubernetes</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-kubernetes-config</artifactId>
+        </dependency>
       </dependencies>
+      <properties>
+        <skipITs>false</skipITs>
+        <quarkus.package.type>native</quarkus.package.type>
+      </properties>
+    </profile>
+    <profile>
+      <id>nativeTest</id>
+      <activation>
+        <property>
+          <name>nativeTest</name>
+        </property>
+      </activation>
       <properties>
         <skipITs>false</skipITs>
         <quarkus.package.type>native</quarkus.package.type>

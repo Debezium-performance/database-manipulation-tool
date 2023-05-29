@@ -50,6 +50,7 @@ public class DmtSchemaParser implements DataParser<DatabaseEntry, JsonObject> {
         }
         catch (Exception ex) {
             LOG.error("Could not parse DatabaseEntity from Json object " + inputObject);
+            LOG.error(ex.getMessage());
             throw new JsonException("Could not parse DatabaseEntity from Json object", ex.getCause());
         }
         return databaseEntry;

@@ -55,6 +55,7 @@ You can reset all databases on DMT start with property `onstart.reset.database`.
 <summary><code>POST</code> <code><b>/Main/CreateTableAndUpsert</b></code> <code>(Upserts json into all databases and creates tables if they did not exist or adds columns so the json can be upserted)</code></summary>
 <summary><code>DELETE</code> <code><b>/Main/DropTable</b></code> <code>(Drops table/collection in every enabled database)</code></summary>
 <summary><code>GET</code> <code><b>/Main/ResetDatabase</b></code> <code>(Drops all databases/schemas and creates them again)</code></summary>
+<summary><code>POST</code> <code><b>/Main/TimedInsert</b></code> <code>(Inserts json into all enabled dbs and returns timestamp of query execution)</code></summary>
 
 <br />
 <summary><code>GET</code> <code><b>/Utility/GetAll</b></code> <code>(Gets all created tables and their current state)</code></summary>

@@ -5,6 +5,7 @@
  */
 package io.debezium.performance.dmt.dao;
 
+import java.time.Instant;
 import java.util.List;
 
 import io.debezium.performance.dmt.model.DatabaseColumn;
@@ -26,5 +27,7 @@ public interface Dao {
     void dropTable(DatabaseEntry databaseEntry);
 
     void resetDatabase();
+
+    Instant timedInsert(DatabaseEntry databaseEntry);
 
 }

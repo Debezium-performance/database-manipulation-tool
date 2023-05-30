@@ -5,6 +5,7 @@
  */
 package io.debezium.performance.dmt.dao;
 
+import java.time.Instant;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
@@ -132,6 +133,21 @@ public final class MongoDao implements Dao {
         }
         catch (Exception me) {
             LOG.error("Could not reset database");
+            LOG.error(me.getMessage());
+            throw me;
+        }
+    }
+
+    @Override
+    public Instant timedInsert(DatabaseEntry databaseEntry) {
+        try {
+            MongoDatabase db = getDatabase();
+            Document insert = bsonCreator.insertDocument(databaseEntry);
+            db.getCollection(databaseEntry.getDatabaseTableMetadata().getName()).insertOne(insert);
+            return Instant.now();
+        }
+        catch (Exception me) {
+            LOG.error("Could not insert into database timed request" + databaseEntry);
             LOG.error(me.getMessage());
             throw me;
         }

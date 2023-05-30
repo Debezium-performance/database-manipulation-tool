@@ -116,6 +116,22 @@ public class MainResource {
         }
     }
 
+    @Path("TimedInsert")
+    @POST
+    public Response timedInsert(JsonObject inputJsonObj) {
+        LOG.debug("Received TIMED INSERT request");
+        try {
+            DatabaseEntry dbEntity = parser.parse(inputJsonObj);
+            JsonObject obj = mainService.timedInsert(dbEntity);
+            LOG.debug("Responded to TIMED INSERT request");
+            return Response.ok().entity(obj.toString()).build();
+        }
+        catch (Exception ex) {
+            LOG.debug("Could not do timed insert");
+            return Response.noContent().status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     void onStart(@Observes StartupEvent ev) {
         if (resetDatabase) {
             LOG.info("Restarting database on startup");

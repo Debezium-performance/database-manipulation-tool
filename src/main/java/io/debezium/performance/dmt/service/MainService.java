@@ -5,12 +5,15 @@
  */
 package io.debezium.performance.dmt.service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.json.JsonObject;
 
+import io.debezium.performance.dmt.utils.TimeJsonBuilder;
 import org.jboss.logging.Logger;
 
 import io.debezium.performance.dmt.dao.Dao;
@@ -38,7 +41,7 @@ public class MainService {
         catch (InnerDatabaseException ex) {
             LOG.error("Error when inserting entry into inner database");
             LOG.error(ex.getMessage());
-            return;
+            return; //TODO: Throw Exception out
         }
         executeToDaos(dao -> dao.insert(databaseEntry));
     }
@@ -104,6 +107,23 @@ public class MainService {
     public void resetDatabase() {
         database.resetDatabase();
         executeToDaos((Dao::resetDatabase));
+    }
+
+    public JsonObject timedInsert(DatabaseEntry databaseEntry) {
+        try {
+            database.insertEntry(databaseEntry);
+        }
+        catch (InnerDatabaseException ex) {
+            LOG.error("Error when timed inserting entry into inner database");
+            LOG.error(ex.getMessage());
+            throw ex;
+        }
+        TimeJsonBuilder builder = new TimeJsonBuilder();
+        for (Dao dao: daoManager.getEnabledDbs()) {
+            Instant instant = dao.timedInsert(databaseEntry);
+            builder.addDbTimestamp(daoManager.prettifyDaoName(dao), instant);
+        }
+        return builder.build();
     }
 
     private void alterTableToDao(List<DatabaseColumn> columns, DatabaseTableMetadata metadata) {

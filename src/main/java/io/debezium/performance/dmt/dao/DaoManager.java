@@ -38,12 +38,12 @@ public final class DaoManager {
     }
 
     public List<String> getEnabledDbsNames() {
-        return enabledDbs.stream().map(
-                dao -> prettifyDaoName(dao.getClass().getSimpleName()))
+        return enabledDbs.stream().map(this::prettifyDaoName)
                 .collect(Collectors.toList());
     }
 
-    private String prettifyDaoName(String daoName) {
+    public String prettifyDaoName(Dao dao) {
+        String daoName = dao.getClass().getSimpleName();
         String split = daoName.split("_")[0];
         return split.substring(0, split.length() - 3);
     }

@@ -8,6 +8,7 @@ package io.debezium.performance.dmt.dao;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Instant;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
@@ -111,6 +112,20 @@ public abstract class AbstractBasicDao implements Dao {
     @Override
     public void delete(DatabaseEntry databaseEntry) {
 
+    }
+
+    @Override
+    public Instant timedInsert(DatabaseEntry databaseEntry) {
+        try (Connection conn = source.getConnection();
+             Statement stmt = conn.createStatement()) {
+            stmt.execute(queryCreator.insertQuery(databaseEntry));
+            return Instant.now();
+        }
+        catch (SQLException ex) {
+            LOG.error("Could not insert into database timed request" + databaseEntry);
+            LOG.error(ex.getMessage());
+            throw new RuntimeSQLException(ex);
+        }
     }
 
     public DataSourceWrapper getSource() {

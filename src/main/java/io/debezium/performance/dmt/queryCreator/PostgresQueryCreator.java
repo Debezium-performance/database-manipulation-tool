@@ -39,7 +39,7 @@ public class PostgresQueryCreator extends AbstractBasicQueryCreator {
         builder.delete(builder.length() - 2, builder.length())
                 .append(")");
         String query = builder.toString();
-        LOG.debug("CREATED TABLE CREATE QUERY: " + query);
+        LOG.debug("Created TABLE CREATE query: " + query);
         return query;
     }
 

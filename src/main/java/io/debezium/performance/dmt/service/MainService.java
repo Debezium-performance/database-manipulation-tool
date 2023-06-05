@@ -13,7 +13,6 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.json.JsonObject;
 
-import io.debezium.performance.dmt.utils.TimeJsonBuilder;
 import org.jboss.logging.Logger;
 
 import io.debezium.performance.dmt.dao.Dao;
@@ -23,6 +22,7 @@ import io.debezium.performance.dmt.model.Database;
 import io.debezium.performance.dmt.model.DatabaseColumn;
 import io.debezium.performance.dmt.model.DatabaseEntry;
 import io.debezium.performance.dmt.model.DatabaseTableMetadata;
+import io.debezium.performance.dmt.utils.TimeJsonBuilder;
 
 @RequestScoped
 public class MainService {
@@ -41,7 +41,7 @@ public class MainService {
         catch (InnerDatabaseException ex) {
             LOG.error("Error when inserting entry into inner database");
             LOG.error(ex.getMessage());
-            return; //TODO: Throw Exception out
+            return; // TODO: Throw Exception out
         }
         executeToDaos(dao -> dao.insert(databaseEntry));
     }
@@ -119,7 +119,7 @@ public class MainService {
             throw ex;
         }
         TimeJsonBuilder builder = new TimeJsonBuilder();
-        for (Dao dao: daoManager.getEnabledDbs()) {
+        for (Dao dao : daoManager.getEnabledDbs()) {
             Instant instant = dao.timedInsert(databaseEntry);
             builder.addDbTimestamp(daoManager.prettifyDaoName(dao), instant);
         }

@@ -117,7 +117,7 @@ public abstract class AbstractBasicDao implements Dao {
     @Override
     public Instant timedInsert(DatabaseEntry databaseEntry) {
         try (Connection conn = source.getConnection();
-             Statement stmt = conn.createStatement()) {
+                Statement stmt = conn.createStatement()) {
             stmt.execute(queryCreator.insertQuery(databaseEntry));
             return Instant.now();
         }

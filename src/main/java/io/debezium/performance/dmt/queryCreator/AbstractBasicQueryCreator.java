@@ -40,7 +40,7 @@ public abstract class AbstractBasicQueryCreator implements QueryCreator {
         builder.delete(builder.length() - 2, builder.length())
                 .append(")");
         String query = builder.toString();
-        LOG.debug("Created INSERT query: " + query);
+//        LOG.debug("Created INSERT query: " + query);
         return query;
     }
 
@@ -62,7 +62,7 @@ public abstract class AbstractBasicQueryCreator implements QueryCreator {
         builder.delete(builder.length() - 2, builder.length())
                 .append(")");
         String query = builder.toString();
-        LOG.debug("Created TABLE CREATE query: " + query);
+//        LOG.debug("Created TABLE CREATE query: " + query);
         return query;
     }
 
@@ -90,7 +90,7 @@ public abstract class AbstractBasicQueryCreator implements QueryCreator {
                 .append("'");
 
         String query = builder.toString();
-        LOG.debug("Created UPDATE query: " + query);
+//        LOG.debug("Created UPDATE query: " + query);
         return query;
     }
 

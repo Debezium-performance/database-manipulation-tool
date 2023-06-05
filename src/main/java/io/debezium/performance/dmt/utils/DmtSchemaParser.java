@@ -10,7 +10,6 @@ import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.JsonException;
-import javax.json.JsonObject;
 
 import org.jboss.logging.Logger;
 
@@ -23,17 +22,17 @@ import io.debezium.performance.dmt.model.DatabaseTableMetadata;
 import io.debezium.performance.dmt.service.MainService;
 
 @ApplicationScoped
-public class DmtSchemaParser implements DataParser<DatabaseEntry, JsonObject> {
+public class DmtSchemaParser implements DataParser<DatabaseEntry, String> {
 
     private static final Logger LOG = Logger.getLogger(MainService.class);
 
     ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public DatabaseEntry parse(JsonObject inputObject) throws JsonException {
+    public DatabaseEntry parse(String inputObject) throws JsonException {
         DatabaseEntry databaseEntry;
         try {
-            var schemaEntry = objectMapper.readValue(inputObject.toString(), io.debezium.performance.dmt.schema.DatabaseEntry.class);
+            var schemaEntry = objectMapper.readValue(inputObject, io.debezium.performance.dmt.schema.DatabaseEntry.class);
 
             List<DatabaseColumnEntry> entries = new ArrayList<>();
             DatabaseTableMetadata table = new DatabaseTableMetadata();

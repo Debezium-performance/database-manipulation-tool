@@ -11,10 +11,11 @@ import java.util.stream.Collectors;
 
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.spi.CDI;
+import javax.inject.Singleton;
 
 import org.jboss.logging.Logger;
 
-@RequestScoped
+@Singleton
 public final class DaoManager {
     List<Dao> enabledDbs;
 

@@ -59,7 +59,7 @@ public class UtilityResource {
     public Response parseTest(JsonObject inputJsonObj) {
         LOG.debug("Received PARSE TEST request");
         try {
-            DatabaseEntry dbEntity = parser.parse(inputJsonObj);
+            DatabaseEntry dbEntity = parser.parse(inputJsonObj.toString());
             return Response.ok().entity("DMT schema is correct").build();
         }
         catch (Exception ex) {

@@ -58,7 +58,7 @@ public class MainService {
             return;
         }
         if (changedColumns == null) {
-            LOG.debug("Creating table in Dbs " + databaseEntry.getDatabaseTableMetadata());
+//            LOG.debug("Creating table in Dbs " + databaseEntry.getDatabaseTableMetadata());
             executeToDaos(dao -> dao.createTable(databaseEntry));
             return;
         }

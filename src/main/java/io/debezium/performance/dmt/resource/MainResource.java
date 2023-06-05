@@ -8,6 +8,7 @@ package io.debezium.performance.dmt.resource;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.json.Json;
 import javax.json.JsonObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -18,6 +19,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
@@ -26,6 +28,8 @@ import io.debezium.performance.dmt.service.MainService;
 import io.debezium.performance.dmt.utils.DmtSchemaParser;
 import io.quarkus.runtime.StartupEvent;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+
+import java.io.StringReader;
 
 @Path("Main")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -50,7 +54,7 @@ public class MainResource {
     public Response insert(JsonObject inputJsonObj) {
         LOG.debug("Received INSERT request");
         try {
-            DatabaseEntry dbEntity = parser.parse(inputJsonObj);
+            DatabaseEntry dbEntity = parser.parse(inputJsonObj.toString());
             mainService.insert(dbEntity);
             return Response.ok().build();
 
@@ -65,7 +69,7 @@ public class MainResource {
     public Response createTable(JsonObject inputJsonObj) {
         LOG.debug("Received CREATE TABLE IF DOES NOT EXIST or ALTER TABLE IF EXISTS request");
         try {
-            DatabaseEntry dbEntity = parser.parse(inputJsonObj);
+            DatabaseEntry dbEntity = parser.parse(inputJsonObj.toString());
             mainService.createTable(dbEntity);
             return Response.ok().build();
 
@@ -77,10 +81,10 @@ public class MainResource {
 
     @Path("CreateTableAndUpsert")
     @POST
-    public Response createTableAndUpsert(JsonObject inputJsonObj) {
-        LOG.debug("Received CREATE TABLE If does not exist and UPSERT request");
+    public Response createTableAndUpsert(String inputJsonString) {
+//        LOG.debug("Received CREATE TABLE if does not exist and UPSERT request");
         try {
-            DatabaseEntry dbEntity = parser.parse(inputJsonObj);
+            DatabaseEntry dbEntity = parser.parse(inputJsonString);
             mainService.upsert(dbEntity);
             return Response.ok().build();
         }
@@ -94,7 +98,7 @@ public class MainResource {
     public Response dropTable(JsonObject inputJsonObj) {
         LOG.debug("Received DROP TABLE request");
         try {
-            DatabaseEntry dbEntity = parser.parse(inputJsonObj);
+            DatabaseEntry dbEntity = parser.parse(inputJsonObj.toString());
             mainService.dropTable(dbEntity);
             return Response.ok().build();
         }
@@ -121,7 +125,7 @@ public class MainResource {
     public Response timedInsert(JsonObject inputJsonObj) {
         LOG.debug("Received TIMED INSERT request");
         try {
-            DatabaseEntry dbEntity = parser.parse(inputJsonObj);
+            DatabaseEntry dbEntity = parser.parse(inputJsonObj.toString());
             JsonObject obj = mainService.timedInsert(dbEntity);
             LOG.debug("Responded to TIMED INSERT request");
             return Response.ok().entity(obj.toString()).build();

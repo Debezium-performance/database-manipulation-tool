@@ -6,6 +6,7 @@
 package io.debezium.performance.dmt.dao;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.Instant;
@@ -13,6 +14,7 @@ import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
 
+import io.debezium.performance.dmt.model.DatabaseColumnEntry;
 import org.jboss.logging.Logger;
 
 import io.debezium.performance.dmt.dataSource.DataSourceWrapper;
@@ -42,8 +44,13 @@ public abstract class AbstractBasicDao implements Dao {
     @Override
     public void insert(DatabaseEntry databaseEntry) {
         try (Connection conn = source.getConnection();
-                Statement stmt = conn.createStatement()) {
-            stmt.execute(queryCreator.insertQuery(databaseEntry));
+             PreparedStatement stmt = conn.prepareStatement(queryCreator.insertQuery(databaseEntry))) {
+            int i = 1;
+            for (DatabaseColumnEntry entry : databaseEntry.getColumnEntries()) {
+                stmt.setObject(i++, entry.value());
+            }
+
+            stmt.executeUpdate();
         }
         catch (SQLException ex) {
             LOG.error("Could not insert into database " + databaseEntry);
@@ -55,11 +62,16 @@ public abstract class AbstractBasicDao implements Dao {
     @Override
     public void update(DatabaseEntry databaseEntry) {
         try (Connection conn = source.getConnection();
-                Statement stmt = conn.createStatement()) {
+                PreparedStatement stmt = conn.prepareStatement(queryCreator.updateQuery(databaseEntry))) {
+
             if (databaseEntry.getPrimaryColumnEntry() == null) {
                 throw new RuntimeException("Cannot update without primary key");
             }
-            stmt.execute(queryCreator.updateQuery(databaseEntry));
+            int i = 1;
+            for (DatabaseColumnEntry entry : databaseEntry.getColumnEntries()) {
+                stmt.setObject(i++, entry.value());
+            }
+            stmt.executeUpdate();
         }
         catch (Exception ex) {
             LOG.error("Could not update database " + databaseEntry);

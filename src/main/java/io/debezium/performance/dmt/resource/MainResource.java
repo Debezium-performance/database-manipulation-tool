@@ -8,6 +8,7 @@ package io.debezium.performance.dmt.resource;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.json.JsonException;
 import javax.json.JsonObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -18,6 +19,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.debezium.performance.dmt.model.DatabaseColumn;
+import io.debezium.performance.dmt.model.DatabaseColumnEntry;
+import io.debezium.performance.dmt.model.DatabaseTableMetadata;
+import io.debezium.performance.load.data.builder.AviationDataBuilder;
+import io.debezium.performance.load.data.builder.RequestBuilder;
+import io.debezium.performance.load.scenarios.builder.ConstantScenarioBuilder;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
@@ -26,6 +33,9 @@ import io.debezium.performance.dmt.service.MainService;
 import io.debezium.performance.dmt.utils.DmtSchemaParser;
 import io.quarkus.runtime.StartupEvent;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Path("Main")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -132,10 +142,50 @@ public class MainResource {
         }
     }
 
+    @Path("Generator")
+    @GET
+    public Response generatorUpsert() {
+        RequestBuilder<ConstantScenarioBuilder> requestBuilder
+                = new RequestBuilder<>(new AviationDataBuilder(), new ConstantScenarioBuilder(1, 1));
+
+        List<io.debezium.performance.dmt.schema.DatabaseEntry> entries = requestBuilder
+                .setEndpoint("http://10.40.3.179:8080/Main/CreateTableAndUpsert")
+                .setRequestCount(10000)
+                .setMaxRows(20)
+                .buildPlain();
+
+        List<DatabaseEntry> list = entries.stream().map(this::parse).toList();
+        for (DatabaseEntry entry : list) {
+            mainService.upsert(entry);
+        }
+        long start = System.currentTimeMillis();
+        mainService.executeBatch();
+        long result = System.currentTimeMillis() - start;
+        LOG.info("Result time is " + result);
+        return Response.ok().build();
+    }
+
     void onStart(@Observes StartupEvent ev) {
         if (resetDatabase) {
             LOG.info("Restarting database on startup");
             mainService.resetDatabase();
         }
+    }
+
+    private DatabaseEntry parse(io.debezium.performance.dmt.schema.DatabaseEntry databaseEntryInput) throws JsonException {
+        DatabaseEntry databaseEntry;
+        List<DatabaseColumnEntry> entries = new ArrayList<>();
+        DatabaseTableMetadata table = new DatabaseTableMetadata();
+
+        table.setName(databaseEntryInput.getName());
+        String primary = databaseEntryInput.getPrimary();
+
+        for (var databaseColumnEntry : databaseEntryInput.getColumnEntries()) {
+            DatabaseColumnEntry entry = new DatabaseColumnEntry(databaseColumnEntry.value(), databaseColumnEntry.columnName(), databaseColumnEntry.dataType());
+            entries.add(entry);
+            table.addColumn(new DatabaseColumn(entry.columnName(), entry.dataType(), primary.equals(entry.columnName())));
+        }
+        databaseEntry = new DatabaseEntry(entries, table);
+        return databaseEntry;
     }
 }

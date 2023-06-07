@@ -9,10 +9,12 @@ import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
 
+import javax.enterprise.context.Dependent;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.json.JsonObject;
 
+import io.debezium.performance.dmt.dao.AbstractBasicDao;
 import org.jboss.logging.Logger;
 
 import io.debezium.performance.dmt.dao.Dao;
@@ -24,7 +26,7 @@ import io.debezium.performance.dmt.model.DatabaseEntry;
 import io.debezium.performance.dmt.model.DatabaseTableMetadata;
 import io.debezium.performance.dmt.utils.TimeJsonBuilder;
 
-@RequestScoped
+@Dependent
 public class MainService {
     @Inject
     DaoManager daoManager;
@@ -102,6 +104,21 @@ public class MainService {
             return;
         }
         executeToDaos(dao -> dao.dropTable(databaseEntry));
+    }
+
+    public void executeBatch() {
+        RuntimeException exception = null;
+        for (Dao dao : daoManager.getEnabledDbs()) {
+            try {
+                ((AbstractBasicDao) dao).executeBatch();
+            }
+            catch (Exception ex) {
+                exception = new RuntimeException(ex.getMessage());
+            }
+        }
+        if (exception != null) {
+            throw exception;
+        }
     }
 
     public void resetDatabase() {

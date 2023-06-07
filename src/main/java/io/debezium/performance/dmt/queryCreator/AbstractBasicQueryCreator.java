@@ -32,15 +32,15 @@ public abstract class AbstractBasicQueryCreator implements QueryCreator {
                 .append(") VALUES (");
 
         for (DatabaseColumnEntry entry : databaseEntry.getColumnEntries()) {
-//            builder.append('\'')
-                    builder.append("?")
-//                    .append('\'')
-                    .append(", ");
+             builder.append('\'')
+            .append(entry.value())
+                     .append('\'')
+                     .append(", ");
         }
         builder.delete(builder.length() - 2, builder.length())
                 .append(")");
         String query = builder.toString();
-//         LOG.debug("Created INSERT query: " + query);
+        // LOG.debug("Created INSERT query: " + query);
         return query;
     }
 
@@ -62,7 +62,7 @@ public abstract class AbstractBasicQueryCreator implements QueryCreator {
         builder.delete(builder.length() - 2, builder.length())
                 .append(")");
         String query = builder.toString();
-         LOG.debug("Created TABLE CREATE query: " + query);
+        LOG.debug("Created TABLE CREATE query: " + query);
         return query;
     }
 
@@ -78,11 +78,11 @@ public abstract class AbstractBasicQueryCreator implements QueryCreator {
                 .append(" SET ");
         for (DatabaseColumnEntry columnEntry : databaseEntry.getColumnEntries()) {
             builder.append(columnEntry.columnName())
-//                    .append(" = '")
-                    .append(" = ")
-                    .append("?")
-                    .append(", ");
-//                    .append("', ");
+                    .append(" = '")
+//                    .append(" = ")
+                    .append(columnEntry.value())
+//                    .append(", ");
+                    .append("', ");
         }
         builder.delete(builder.length() - 2, builder.length())
                 .append(" WHERE ")
@@ -92,7 +92,7 @@ public abstract class AbstractBasicQueryCreator implements QueryCreator {
                 .append("'");
 
         String query = builder.toString();
-//         LOG.debug("Created UPDATE query: " + query);
+        // LOG.debug("Created UPDATE query: " + query);
         return query;
     }
 

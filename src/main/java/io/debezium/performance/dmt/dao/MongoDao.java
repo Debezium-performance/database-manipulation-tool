@@ -14,7 +14,6 @@ import javax.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.eclipse.microprofile.faulttolerance.Retry;
 import org.jboss.logging.Logger;
 
 import com.mongodb.client.MongoClient;
@@ -33,7 +32,6 @@ import io.quarkus.mongodb.MongoClientName;
 @RequestScoped
 @LookupIfProperty(name = "quarkus.mongodb.main.enabled", stringValue = "true")
 @Unremovable
-@Retry
 public final class MongoDao implements Dao {
 
     @ConfigProperty(name = "mongodb.database")

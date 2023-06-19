@@ -142,7 +142,10 @@ public final class MongoDao implements Dao {
 
     @Override
     public void executePreparedStatement(String statement) {
+    }
 
+    @Override
+    public void executeBatchStatement(List<String> statements) {
     }
 
     @Override

@@ -148,6 +148,21 @@ public abstract class AbstractBasicDao implements Dao {
         }
     }
 
+    @Override
+    public void executeBatchStatement(List<String> statements) {
+        try (Connection conn = source.getConnection();
+             Statement stmt = conn.createStatement()) {
+            for (int i = 1; i < statements.size(); i++) {
+                stmt.addBatch(statements.get(i));
+            }
+            stmt.executeBatch();
+        }
+        catch (SQLException ex) {
+            LOG.error("Could not execute batch statement " + statements.get(1) + " ...");
+            LOG.error(ex.getMessage());
+        }
+    }
+
     public DataSourceWrapper getSource() {
         return source;
     }

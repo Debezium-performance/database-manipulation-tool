@@ -136,14 +136,31 @@ public class MainResource {
     @Path("GenerateLoad")
     @POST
     public Response generateLoad(@RestQuery int count, @RestQuery int maxRows) {
+        LOG.debug("Received generate load request");
         if (count == 0|| maxRows == 0) {
             return Response.noContent().status(Response.Status.BAD_REQUEST).build();
         }
         long start = System.currentTimeMillis();
-        long time = mainService.generateLoad(count, maxRows);
+        long[] time = mainService.generateLoad(count, maxRows);
         long totalTime = System.currentTimeMillis() - start;
-        return Response.ok().entity("jdbc last executor started " + time
-                + " ms\n" + "total time " +  totalTime + " ms").build();
+        return Response.ok().entity("last executor started " + time[0] + " ms\n" +
+                "last executor finished " + time[1] + " ms\n" +
+                "total time " +  totalTime + " ms").build();
+    }
+
+    @Path("GenerateBatchLoad")
+    @POST
+    public Response generateBatchLoad(@RestQuery int count, @RestQuery int maxRows) {
+        LOG.debug("Received generate load and use batch request");
+        if (count == 0|| maxRows == 0) {
+            return Response.noContent().status(Response.Status.BAD_REQUEST).build();
+        }
+        long start = System.currentTimeMillis();
+        long[] time = mainService.generateBatchLoad(count, maxRows);
+        long totalTime = System.currentTimeMillis() - start;
+        return Response.ok().entity("last executor started " + time[0] + " ms\n" +
+                "last executor finished " + time[1] + " ms\n" +
+                "total time " +  totalTime + " ms").build();
     }
 
     void onStart(@Observes StartupEvent ev) {

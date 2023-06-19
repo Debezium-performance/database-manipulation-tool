@@ -12,6 +12,6 @@ public class RunnablePreparedUpsert extends RunnableUpsert {
 
     @Override
     public void run() {
-        executeToDaos(dao -> dao.executePreparedStatement(statement));
+        executeToDaos(dao -> dao.executePreparedStatement(sqlQuery));
     }
 }

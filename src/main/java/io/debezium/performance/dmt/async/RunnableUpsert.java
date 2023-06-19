@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 public class RunnableUpsert implements Runnable {
 
     List<Dao> dbs;
-    String statement;
+    String sqlQuery;
 
     public RunnableUpsert(List<Dao> dbs) {
         this.dbs = dbs;
@@ -16,7 +16,7 @@ public class RunnableUpsert implements Runnable {
 
     @Override
     public void run() {
-        executeToDaos(dao -> dao.executeStatement(statement));
+        executeToDaos(dao -> dao.executeStatement(sqlQuery));
     }
 
     protected void executeToDaos(Consumer<Dao> func) {
@@ -25,11 +25,11 @@ public class RunnableUpsert implements Runnable {
         }
     }
 
-    public String getStatement() {
-        return statement;
+    public String getSqlQuery() {
+        return sqlQuery;
     }
 
-    public void setStatement(String statement) {
-        this.statement = statement;
+    public void setSqlQuery(String sqlQuery) {
+        this.sqlQuery = sqlQuery;
     }
 }

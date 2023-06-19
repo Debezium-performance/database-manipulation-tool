@@ -2,13 +2,16 @@ package io.debezium.performance.dmt.async;
 
 import io.debezium.performance.dmt.dao.DaoManager;
 import io.quarkus.runtime.Startup;
+import org.eclipse.microprofile.config.ConfigProvider;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,24 +22,25 @@ public class ExecutorPool {
     private final ExecutorService pool;
     private final BlockingQueue<RunnableUpsert> runnableUpsertsQueue;
 
-    private AtomicInteger counter;
-
-    private long timer = 0;
-    private int requestsCount = 0;
+    private final BlockingQueue<RunnableBatchUpsert> runnableBatchUpsertsQueue;
+    private CountDownLatch latch;
     private static final Logger LOG = Logger.getLogger(ExecutorPool.class);
 
 
     @Inject
     public ExecutorPool(@ConfigProperty(name = "executor.size", defaultValue = "10") int poolSize, DaoManager manager) {
         pool = Executors.newFixedThreadPool(poolSize);
-        counter = new AtomicInteger(0);
+        latch = new CountDownLatch(0);
         runnableUpsertsQueue = new ArrayBlockingQueue<>(poolSize);
+        runnableBatchUpsertsQueue = new ArrayBlockingQueue<>(poolSize);
         for (int i = 0; i < poolSize; i++) {
+            // For java insertion/update method change the Runnable.
             runnableUpsertsQueue.add(new RunnablePreparedUpsert(manager.getEnabledDbs()));
+            runnableBatchUpsertsQueue.add(new RunnableBatchUpsert(manager.getEnabledDbs()));
         }
     }
 
-    public void execute(String statement) {
+    public void execute(String sqlQuery) {
         RunnableUpsert task;
         try {
             task = runnableUpsertsQueue.take();
@@ -45,8 +49,8 @@ public class ExecutorPool {
         }
 //        LOG.info("Taken task");
         pool.submit(() -> {
-            task.setStatement(statement);
-//            LOG.info("Set statement");
+            task.setSqlQuery(sqlQuery);
+//            LOG.info("Set sqlQuery");
             task.run();
 //            LOG.info("Finished task");
             try {
@@ -54,28 +58,39 @@ public class ExecutorPool {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            int localCounter = counter.addAndGet(1);
-            if (localCounter >= requestsCount) {
-                LOG.info("Counter is: " + localCounter);
-                LOG.info("Last executor finished: " + (System.currentTimeMillis() - timer));
-            }
+            latch.countDown();
 //            LOG.info("Returned runnable");
         });
     }
 
-    public void restartCounter() {
-        counter = new AtomicInteger(0);
+    public void executeBatch(List<String> sqlQueries) {
+        RunnableBatchUpsert task;
+        try {
+            task = runnableBatchUpsertsQueue.take();
+        } catch (InterruptedException e) {
+            return;
+        }
+        pool.submit(() -> {
+            task.setSqlQueriesBatch(sqlQueries);
+            task.run();
+            try {
+                runnableBatchUpsertsQueue.put(task);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            latch.countDown();
+        });
     }
 
-    public void startTimer() {
-        timer = System.currentTimeMillis();
+    public void setCountDownLatch(int number) {
+        latch = new CountDownLatch(number);
     }
 
-    public void setTimer(long timer) {
-        this.timer = timer;
+    public CountDownLatch getLatch() {
+        return latch;
     }
 
-    public void setRequestsCount(int requestsCount) {
-        this.requestsCount = requestsCount;
+    public int getPoolSize() {
+        return ConfigProvider.getConfig().getValue("executor.size", int.class);
     }
 }

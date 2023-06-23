@@ -1,0 +1,40 @@
+copy ssh keys (ssh-copy-id -i psi_key.pub root@hostname) to both machines
+[Installing mysql on one machine]
+install mysql-server with dnf (dnf install mysql-server)
+start mysqld (systemctl start mysqld)
+create directory /home/mysql
+set owner to mysql dir (chown -R --reference /var/lib/mysql mysql)
+set permissions to mysql dir (chmod -R --reference /var/lib/mysql mysql)
+set selinux context (semanage fcontext -a -t mysqld_db_t "/home/mysql(/.*)?")
+apply selinux context (restorecon -Rv /home/mysql/)
+increase file descriptors limit to 4096 (ulimit -n 4096)
+put configuration to /etc/my.cnf
+restart mysqld (systemctl restart mysqld)
+it is necceseary to use symlink for sysbench  (ln -s /home/mysql/mysql.sock /var/lib/mysql/mysql.sock) ==== sysbench uses wrong sock even when setting up different one 
+do mysql secure installation and set root password (mysql_secure_installation; n; password; password; n; n; y, y)
+fix remote root access in mysql console (GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost'; UPDATE mysql.user SET host='%' WHERE user='root';)
+restart mysqld (systemctl restart mysqld)
+add database 
+maybe install tuned
+
+[Installing dmt on second machine]
+
+install maven-openjdk-17 (dnf install maven-openjdk1) ==== installs java and maven
+set maven settings.xml so dmt can download perf dependencies ==== run maven at least once
+get data generator of version 0.3.0 and build it (dnf install uznip; scp data-generator.zip root@hostname:/home/data-generator.zip; mvn install) ==== after release, this step will be skipped.
+install git 
+clone dmt
+checkout to Performance-edition
+set mysql jdbc conection string 
+mvn install
+start dmt (java -Xms50G -jar target/quarkus-app/quarkus-run.jar)
+
+
+
+
+
+
+
+
+[sysbench test]
+sysbench --mysql-user=root --mysql-password=***** --mysql-db=otloukanek --table_size=10000000 --max-requests=0 --simple-ranges=0 --distinct-ranges=0 --sum-ranges=0 --order-ranges=0 --point-selects=0 --time=60 --threads=100 --rand-type=uniform oltp_read_write run

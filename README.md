@@ -1,7 +1,11 @@
-# Database-manipulation-tool
-Java quarkus application used for idempotent upsertion of a single entity into multiple different databases.
-Main functionality is the upsert with table creation/alteration. You send a http request with JSON body (example below)
-and the tables will be either created or altered (columns will be added to he table) so the schema corresponds with the JSON. Then it proceeds to either insert or update the row into all the databases.  
+# Database-manipulation-tool (Performance edition)
+This is a special version used for database performance testing. There are added and removed features, endpoints and dependencies.
+Changes:
+- Most of the logging was removed
+- Query retrying was removed
+- Prometheus' metrics are no longer exposed
+- Added generate load endpoints. Option to set number of worker threads and connections.
+- Tracks time of requests.
 ## Working features
 
 This is currently in alpha state so there are not many features completed and the ones that are finished aren't tested properly.
@@ -60,7 +64,9 @@ You can reset all databases on DMT start with property `onstart.reset.database`.
 <br />
 <summary><code>GET</code> <code><b>/Utility/GetAll</b></code> <code>(Gets all created tables and their current state)</code></summary>
 <summary><code>POST</code> <code><b>/Utility/TestSchema</b></code> <code>(Test if the input json schema is correct)</code></summary>
-
+<br />
+<summary><code>POST</code> <code><b>/Main/GenerateLoad?count={count}&maxRows={maxRows}</b></code> <code>(Creates set number of queries with maximum table size and upserts them into databases. Returns the time length of the whole request and just the execution of the queries)</code></summary>
+<summary><code>POST</code> <code><b>/Main/GenerateBatchLoad?count={count}&maxRows={maxRows}</b></code> <code>(Same as GenerateLoad but uses batch statements for better performance)</code></summary>
 
 ## Running the application in dev mode
 

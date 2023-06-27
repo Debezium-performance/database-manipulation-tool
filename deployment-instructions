@@ -10,7 +10,7 @@ apply selinux context (restorecon -Rv /home/mysql/)
 increase file descriptors limit to 4096 (ulimit -n 4096)
 put configuration to /etc/my.cnf
 restart mysqld (systemctl restart mysqld)
-it is necceseary to use symlink for sysbench  (ln -s /home/mysql/mysql.sock /var/lib/mysql/mysql.sock) ==== sysbench uses wrong sock even when setting up different one 
+it is necceseary to use symlink for sysbench  (ln -s /home/mysql/mysql.sock /var/lib/mysql/mysql.sock) ==== sysbench uses wrong sock even when setting up different one in config file
 do mysql secure installation and set root password (mysql_secure_installation; n; password; password; n; n; y, y)
 fix remote root access in mysql console (GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost'; UPDATE mysql.user SET host='%' WHERE user='root';)
 restart mysqld (systemctl restart mysqld)
@@ -19,9 +19,9 @@ maybe install tuned
 
 [Installing dmt on second machine]
 
-install maven-openjdk-17 (dnf install maven-openjdk1) ==== installs java and maven
+install maven-openjdk-17 (dnf install maven-openjdk17) ==== installs java and maven
 set maven settings.xml so dmt can download perf dependencies ==== run maven at least once
-get data generator of version 0.3.0 and build it (dnf install uznip; scp data-generator.zip root@hostname:/home/data-generator.zip; mvn install) ==== after release, this step will be skipped.
+get data generator of version 0.3.0 and build it (dnf install unzip; scp data-generator.zip root@hostname:/home/data-generator.zip; unzip data-generator.zip; mvn install) ==== after release, this step will be skipped.
 install git 
 clone dmt
 checkout to Performance-edition

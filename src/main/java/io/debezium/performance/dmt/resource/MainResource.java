@@ -8,7 +8,9 @@ package io.debezium.performance.dmt.resource;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.json.Json;
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -143,9 +145,10 @@ public class MainResource {
         long start = System.currentTimeMillis();
         long[] time = mainService.generateLoad(count, maxRows);
         long totalTime = System.currentTimeMillis() - start;
-        return Response.ok().entity("last executor started " + time[0] + " ms\n" +
-                "last executor finished " + time[1] + " ms\n" +
-                "total time " +  totalTime + " ms").build();
+//        return Response.ok().entity("last executor started " + time[0] + " ms\n" +
+//                "last executor finished " + time[1] + " ms\n" +
+//                "total time " +  totalTime + " ms").build();
+        return generateLoadJsonResponse(totalTime, time[0], time[1]);
     }
 
     @Path("GenerateBatchLoad")
@@ -158,9 +161,10 @@ public class MainResource {
         long start = System.currentTimeMillis();
         long[] time = mainService.generateBatchLoad(count, maxRows);
         long totalTime = System.currentTimeMillis() - start;
-        return Response.ok().entity("last executor started " + time[0] + " ms\n" +
-                "last executor finished " + time[1] + " ms\n" +
-                "total time " +  totalTime + " ms").build();
+//        return Response.ok().entity("last executor started " + time[0] + " ms\n" +
+//                "last executor finished " + time[1] + " ms\n" +
+//                "total time " +  totalTime + " ms").build();
+        return generateLoadJsonResponse(totalTime, time[0], time[1]);
     }
 
     void onStart(@Observes StartupEvent ev) {
@@ -168,5 +172,12 @@ public class MainResource {
             LOG.info("Restarting database on startup");
             mainService.resetDatabase();
         }
+    }
+
+    private Response generateLoadJsonResponse(long totalTime, long lastExecStart, long lastExecFinish) {
+        JsonObject json = Json.createObjectBuilder().add("last executor started (ms)", lastExecStart)
+                .add("last executor finished (ms)", lastExecFinish)
+                .add("total time (ms)", totalTime).build();
+         return Response.ok().type(MediaType.APPLICATION_JSON).entity(json.toString()).build();
     }
 }

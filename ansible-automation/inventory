@@ -4,6 +4,10 @@ mysql ansible_host= ansible_user=
 [dmts]
 dmt ansible_host= ansible_user=
 
-[dbservers:vars]
+[all:vars]
 db_password=
 testing_database=
+
+[dmts:vars]
+dmt_repository=https://github.com/Debezium-performance/database-manipulation-tool.git
+dmt_branch=Performance-edition

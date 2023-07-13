@@ -11,3 +11,5 @@ testing_database=
 [dmts:vars]
 dmt_repository=https://github.com/Debezium-performance/database-manipulation-tool.git
 dmt_branch=Performance-edition
+git_username=
+git_token=

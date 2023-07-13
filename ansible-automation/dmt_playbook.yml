@@ -12,11 +12,22 @@
       dnf:
         name: maven-openjdk17
 
+    - name: Create .m2 directory
+      file:
+        path: ~/.m2
+        state: directory
+
+    - name: Copy maven settings.xml for github authentication
+      template:
+        src: settings.xml.j2
+        dest: ~/.m2/settings.xml
+        
     - name: Clone dmt 
       git:
         repo: "{{ dmt_repository }}"
         version: "{{ dmt_branch }}"
         dest: "~/database-manipulation-tool"
+        force: true
 
     - name: Create jdbc connection string to mysql
       set_fact: 
@@ -33,3 +44,8 @@
         path: "~/database-manipulation-tool/src/main/resources/application.properties"
         regexp: '^quarkus.datasource.mysql.jdbc.enabled=.*$'
         replace: "quarkus.datasource.mysql.jdbc.enabled=true"
+
+    - name: Build DMT
+      command:
+        cmd: mvn clean install 
+        chdir: "~/database-manipulation-tool"

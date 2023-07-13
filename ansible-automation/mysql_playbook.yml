@@ -74,6 +74,12 @@
         src: /home/mysql/mysql.sock
         dest: /var/lib/mysql/mysql.sock
 
+    - name: Install python3 mysqldb tools
+      become: true
+      dnf:
+        name: python3-PyMySQL
+
+
     - name: Set mysql root password
       become: true
       community.mysql.mysql_user:

@@ -1,0 +1,51 @@
+---
+- hosts: dmts
+  name: Deploying database manipulation tool
+  tasks: 
+    - name: Install git 
+      become: true
+      dnf:
+        name: git
+    
+    - name: Install maven and openjdk 17
+      become: true
+      dnf:
+        name: maven-openjdk17
+
+    - name: Create .m2 directory
+      file:
+        path: ~/.m2
+        state: directory
+
+    - name: Copy maven settings.xml for github authentication
+      template:
+        src: settings.xml.j2
+        dest: ~/.m2/settings.xml
+        
+    - name: Clone dmt 
+      git:
+        repo: "{{ dmt_repository }}"
+        version: "{{ dmt_branch }}"
+        dest: "~/database-manipulation-tool"
+        force: true
+
+    - name: Create jdbc connection string to mysql
+      set_fact: 
+        mysql_connection_string: "jdbc:mysql://root:{{ db_password }}@{{ hostvars['mysql'].ansible_host }}:3306/{{ testing_database }}"
+
+    - name: Set jdbc connection string variable in dmt properties
+      replace:
+        path: "~/database-manipulation-tool/src/main/resources/application.properties"
+        regexp: '^quarkus.datasource.mysql.jdbc.url=.*$'
+        replace: "quarkus.datasource.mysql.jdbc.url={{ mysql_connection_string }}"
+
+    - name: Enable mysql datasource in dmt properties
+      replace:
+        path: "~/database-manipulation-tool/src/main/resources/application.properties"
+        regexp: '^quarkus.datasource.mysql.jdbc.enabled=.*$'
+        replace: "quarkus.datasource.mysql.jdbc.enabled=true"
+
+    - name: Build DMT
+      command:
+        cmd: mvn clean install 
+        chdir: "~/database-manipulation-tool"

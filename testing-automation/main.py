@@ -114,14 +114,16 @@ def send_reset_database_request():
 
 
 def start_dmt(ssh_client, threads):
+    print("Starting dmt")
     set_executors_and_connections(ssh_client, threads)
     start_command = "java -jar -Xms{} {}/target/quarkus-app/quarkus-run.jar &"
-    ssh_client.sendline(start_command.format(DMT_LOCATION, HEAP_SIZE))
+    ssh_client.sendline(start_command.format(HEAP_SIZE, DMT_LOCATION))
     ssh_client.prompt()
     ssh_client.sendline("echo $!")
     ssh_client.prompt()
     __pid = ssh_client.before.decode('UTF-8').splitlines()[-1]
     time.sleep(DMT_START_WAIT_TIME/1000*threads + 1)
+    print("Dmt started with pid: {}".format(__pid))
     # Waits 1 second and then milliseconds specified in DMT_START_WAIT_TIME per connection
     return __pid
 

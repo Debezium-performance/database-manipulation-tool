@@ -15,6 +15,9 @@ dmts
 netdata
 netdataParent
 
+[mainDatabase]
+mongodbAggregate ansible_host= ansible_user=
+
 [all:vars]
 db_password=
 testing_database=

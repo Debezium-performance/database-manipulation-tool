@@ -1,0 +1,26 @@
+---
+- hosts: mainDatabase
+  name: Deploying Mongodb for Performance data aggregation
+  become: true
+  become_method: sudo
+  tasks:
+    - name: Add repo file
+      template:
+        src: repo.j2
+        dest: /etc/yum.repos.d/mongo.repo
+
+    - name: Install mongodb
+      dnf: 
+        name: mongodb-org
+        state: present
+
+    - name: Configure mongodb
+      template:
+        src: mongod.conf.j2
+        dest: /etc/mongod.conf
+
+    - name: Run mongodb
+      service:
+        name: mongod
+        state: started
+        enabled: yes

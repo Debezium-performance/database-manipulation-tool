@@ -14,6 +14,40 @@
         name: mongodb-org
         state: present
 
+    - name: Create data directory
+      file: 
+        path: /data/db
+        state: directory
+        owner: mongod
+        group: mongod
+        recurse: true
+
+    - name: Create log directory
+      file: 
+        path: /var/log/mongodb
+        state: directory
+        owner: mongod
+        group: mongod
+        recurse: true
+
+    - name: Change selinux context
+      become: true
+      community.general.sefcontext:
+        target: '/data/db(/.*)?'
+        setype: mongod_var_lib_t
+
+    - name: Apply selinux context
+      become: true
+      command: restorecon -Rv /data/db
+
+    - name: Increase file descriptors limit
+      become: true
+      community.general.pam_limits:
+        value: 65000
+        limit_type: '-'
+        domain: '*'
+        limit_item: "nofile"
+
     - name: Configure mongodb
       template:
         src: mongod.conf.j2

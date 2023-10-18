@@ -20,6 +20,7 @@
         state: directory
         owner: mongod
         group: mongod
+        mode: 0777
         recurse: true
 
     - name: Create log directory
@@ -28,6 +29,7 @@
         state: directory
         owner: mongod
         group: mongod
+        mode: 0777
         recurse: true
 
     - name: Change selinux context

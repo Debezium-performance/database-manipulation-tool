@@ -70,6 +70,7 @@ def send_generate_request(count, max_rows):
     url = "http://{}:8080/Main/GenerateBatchLoad"
     for i in range(5):
         try:
+            print("Starting request number {}".format(i))
             response = requests.post(url.format(REMOTE_HOSTNAME), params=params)
         except requests.exceptions.ConnectionError:
             if i != 5:

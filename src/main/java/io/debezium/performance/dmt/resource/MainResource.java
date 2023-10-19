@@ -136,6 +136,7 @@ public class MainResource {
     }
 
     @Path("GenerateLoad")
+    @Consumes()
     @POST
     public Response generateLoad(@RestQuery int count, @RestQuery int maxRows) {
         LOG.debug("Received generate load request");
@@ -149,6 +150,7 @@ public class MainResource {
     }
 
     @Path("GenerateBatchLoad")
+    @Consumes()
     @POST
     public Response generateBatchLoad(@RestQuery int count, @RestQuery int maxRows) {
         LOG.debug("Received generate load and use batch request");

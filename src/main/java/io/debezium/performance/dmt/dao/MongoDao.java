@@ -11,6 +11,7 @@ import java.util.List;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
+import com.mongodb.client.model.WriteModel;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -73,12 +74,24 @@ public final class MongoDao implements Dao {
             if (primary == null) {
                 throw new RuntimeException("Cannot update without primary key");
             }
-            Bson filter = Filters.eq(primary.columnName(), primary.value());
+            Bson filter = bsonCreator.getPrimaryFilter(databaseEntry);
             Bson update = bsonCreator.updateBson(databaseEntry);
             db.getCollection(databaseEntry.getDatabaseTableMetadata().getName()).updateOne(filter, update);
         }
         catch (Exception me) {
             LOG.error("Could not update database" + databaseEntry);
+            LOG.error(me.getMessage());
+            throw me;
+        }
+    }
+
+    public void bulkWrite(List<WriteModel<Document>> bulkOperations, String collection) {
+        try {
+            MongoDatabase db = getDatabase();
+            db.getCollection(collection).bulkWrite(bulkOperations);
+        }
+        catch (Exception me) {
+            LOG.error("Could not do bulk operation to collection " + collection);
             LOG.error(me.getMessage());
             throw me;
         }

@@ -63,4 +63,11 @@ public final class DaoManager {
         String split = daoName.split("_")[0];
         return split.substring(0, split.length() - 3);
     }
+
+    public MongoDao getMongoDao() {
+        if (mongo.isResolvable()) {
+            return mongo.get();
+        }
+        return null;
+    }
 }

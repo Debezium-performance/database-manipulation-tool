@@ -10,7 +10,6 @@ import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -144,7 +143,7 @@ public class MainResource {
             return Response.noContent().status(Response.Status.BAD_REQUEST).build();
         }
         long start = System.currentTimeMillis();
-        long[] time = mainService.generateLoad(count, maxRows);
+        long[] time = mainService.createAndExecuteLoad(count, maxRows);
         long totalTime = System.currentTimeMillis() - start;
         return generateLoadJsonResponse(totalTime, time[0], time[1]);
     }
@@ -158,9 +157,23 @@ public class MainResource {
             return Response.noContent().status(Response.Status.BAD_REQUEST).build();
         }
         long start = System.currentTimeMillis();
-        long[] time = mainService.generateBatchLoad(count, maxRows);
+        long[] time = mainService.createAndExecuteBatchLoad(count, maxRows);
         long totalTime = System.currentTimeMillis() - start;
         return generateLoadJsonResponse(totalTime, time[0], time[1]);
+    }
+
+    @Path("GenerateMongoBulkSizedLoad")
+    @Consumes()
+    @POST
+    public Response generateMongoBulkSizedLoad(@RestQuery int count, @RestQuery int maxRows, @RestQuery int messageSize) {
+        LOG.debug("Received generate mongo bulk load with custom message size request");
+        if (count == 0|| maxRows == 0 || messageSize == 0) {
+            return Response.noContent().status(Response.Status.BAD_REQUEST).build();
+        }
+        long start = System.currentTimeMillis();
+        long time = mainService.createAndExecuteSizedMongoLoad(count, maxRows, messageSize);
+        long totalTime = System.currentTimeMillis() - start;
+        return generateLoadJsonResponse(totalTime, 0, time);
     }
 
     void onStart(@Observes StartupEvent ev) {

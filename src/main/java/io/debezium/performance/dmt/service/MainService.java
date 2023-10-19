@@ -30,7 +30,6 @@ import io.debezium.performance.dmt.utils.TimeJsonBuilder;
 public class MainService {
     @Inject
     DaoManager daoManager;
-
     @Inject
     Database database;
 
@@ -52,7 +51,6 @@ public class MainService {
         List<DatabaseColumn> changedColumns;
         try {
             changedColumns = database.createOrAlterTable(databaseEntry.getDatabaseTableMetadata());
-
         }
         catch (InnerDatabaseException ex) {
             LOG.error("Error when creating table in database");

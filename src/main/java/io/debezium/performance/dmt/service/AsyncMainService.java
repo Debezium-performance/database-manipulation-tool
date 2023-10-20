@@ -37,6 +37,16 @@ public class AsyncMainService extends MainService {
         return waitForLastTask(start);
     }
 
+    public long[] createAndExecuteLoadSecond(int count, int maxRows) {
+        List<String> statements = generateAviationSqlQueries(count, maxRows);
+        executorPool.setCountDownLatch(statements.size());
+        long start = System.currentTimeMillis();
+        for (String statement: statements) {
+            executorPool.executeFunction(dao -> dao.executePreparedStatement(statement));
+        }
+        return waitForLastTask(start);
+    }
+
     public long[] createAndExecuteBatchLoad(int count, int maxRows) {
         List<String> queries = generateAviationSqlQueries(count, maxRows);
         int poolSize = executorPool.getPoolSize();
@@ -64,16 +74,18 @@ public class AsyncMainService extends MainService {
         executorPool.setCountDownLatch(batches.size());
         long start = System.currentTimeMillis();
         for (List<String> batch: batches) {
-            executorPool.executeBatch(batch);
             executorPool.executeFunction(dao -> dao.executeBatchStatement(batch));
         }
         return waitForLastTask(start);
     }
 
     public long createAndExecuteSizedMongoLoad(int count, int maxRows, int messageSize) {
+        MongoDao mongo = daoManager.getMongoDao();
+        if (mongo == null) {
+            throw new RuntimeException("Missing Mongo database.");
+        }
         String collection = generator.generateByteBatch(1,1,1).get(0).getDatabaseTableMetadata().getName();
         List<WriteModel<Document>> bulkOperations = generateSizedMongoBulk(count, maxRows, messageSize);
-        MongoDao mongo = daoManager.getMongoDao();
         long start = System.currentTimeMillis();
         mongo.bulkWrite(bulkOperations, collection);
         long end = System.currentTimeMillis();

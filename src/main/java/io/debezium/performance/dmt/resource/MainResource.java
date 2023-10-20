@@ -162,6 +162,34 @@ public class MainResource {
         return generateLoadJsonResponse(totalTime, time[0], time[1]);
     }
 
+    @Path("GenerateLoadSecond")
+    @Consumes()
+    @POST
+    public Response generateLoadSecond(@RestQuery int count, @RestQuery int maxRows) {
+        LOG.debug("Received generate load request with new runnables");
+        if (count == 0|| maxRows == 0) {
+            return Response.noContent().status(Response.Status.BAD_REQUEST).build();
+        }
+        long start = System.currentTimeMillis();
+        long[] time = mainService.createAndExecuteLoadSecond(count, maxRows);
+        long totalTime = System.currentTimeMillis() - start;
+        return generateLoadJsonResponse(totalTime, time[0], time[1]);
+    }
+
+    @Path("GenerateBatchLoadSecond")
+    @Consumes()
+    @POST
+    public Response generateBatchLoadSecond(@RestQuery int count, @RestQuery int maxRows) {
+        LOG.debug("Received generate load and use batch request with new runnables");
+        if (count == 0|| maxRows == 0) {
+            return Response.noContent().status(Response.Status.BAD_REQUEST).build();
+        }
+        long start = System.currentTimeMillis();
+        long[] time = mainService.createAndExecuteBatchLoadSecond(count, maxRows);
+        long totalTime = System.currentTimeMillis() - start;
+        return generateLoadJsonResponse(totalTime, time[0], time[1]);
+    }
+
     @Path("GenerateMongoBulkSizedLoad")
     @Consumes()
     @POST

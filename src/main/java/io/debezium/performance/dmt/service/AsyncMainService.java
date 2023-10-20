@@ -32,38 +32,12 @@ public class AsyncMainService extends MainService {
         executorPool.setCountDownLatch(statements.size());
         long start = System.currentTimeMillis();
         for (String statement: statements) {
-            executorPool.execute(statement);
-        }
-        return waitForLastTask(start);
-    }
-
-    public long[] createAndExecuteLoadSecond(int count, int maxRows) {
-        List<String> statements = generateAviationSqlQueries(count, maxRows);
-        executorPool.setCountDownLatch(statements.size());
-        long start = System.currentTimeMillis();
-        for (String statement: statements) {
             executorPool.executeFunction(dao -> dao.executePreparedStatement(statement));
         }
         return waitForLastTask(start);
     }
 
     public long[] createAndExecuteBatchLoad(int count, int maxRows) {
-        List<String> queries = generateAviationSqlQueries(count, maxRows);
-        int poolSize = executorPool.getPoolSize();
-        int batchSize = queries.size() / poolSize;
-        List<List<String>> batches = new ArrayList<>();
-        for (int i = 0; i < queries.size(); i += batchSize) {
-            batches.add(queries.subList(i, Math.min(i + batchSize, queries.size())));
-        }
-        executorPool.setCountDownLatch(batches.size());
-        long start = System.currentTimeMillis();
-        for (List<String> batch: batches) {
-            executorPool.executeBatch(batch);
-        }
-        return waitForLastTask(start);
-    }
-
-    public long[] createAndExecuteBatchLoadSecond(int count, int maxRows) {
         List<String> queries = generateAviationSqlQueries(count, maxRows);
         int poolSize = executorPool.getPoolSize();
         int batchSize = queries.size() / poolSize;

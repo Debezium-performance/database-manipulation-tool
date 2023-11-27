@@ -33,21 +33,20 @@ public class Generator {
         AtomicInteger i = new AtomicInteger(1);
         String message = "a".repeat(messageSize);
         List<io.debezium.performance.dmt.schema.DatabaseEntry> entries = requestBuilder
-                .setRequestCount(count)
-                .setMaxRows(maxRows)
-                .buildPlain();
-        entries.forEach(databaseEntry -> {
-            databaseEntry.setPrimary("_id");
-            databaseEntry.getColumnEntries().forEach(databaseColumnEntry -> {
-                if (databaseColumnEntry.getColumnName().equals("id")){
-                    databaseColumnEntry.setColumnName("_id");
-                }
-                if (databaseColumnEntry.getColumnName().equals("payload")) {
-                    databaseColumnEntry.setValue(i.getAndIncrement() + message);
-                }
-            });
-        });
-        System.out.println(entries.get(0));
+            .setRequestCount(count)
+            .setMaxRows(maxRows)
+            .buildPlain();
+           entries.forEach(databaseEntry -> {
+                databaseEntry.setPrimary("_id");
+                databaseEntry.getColumnEntries().forEach(databaseColumnEntry -> {
+                    if (databaseColumnEntry.getColumnName().equals("id")){
+                        databaseColumnEntry.setColumnName("_id");
+                    }
+                    if (databaseColumnEntry.getColumnName().equals("payload")) {
+                        databaseColumnEntry.setValue(i.getAndIncrement() + message);
+                    }
+                });
+           });
         return entries.stream().map(parser::parse).toList();
     }
 }

@@ -7,6 +7,7 @@ import io.debezium.performance.dmt.generator.Generator;
 import io.debezium.performance.dmt.model.DatabaseEntry;
 import io.debezium.performance.dmt.queryCreator.MongoBsonCreator;
 import io.debezium.performance.dmt.queryCreator.MysqlQueryCreator;
+import io.debezium.performance.dmt.queryCreator.PostgresQueryCreator;
 import io.quarkus.runtime.Startup;
 import org.bson.Document;
 import org.jboss.logging.Logger;
@@ -15,6 +16,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import org.jboss.logging.Logger;
 
 @RequestScoped
 @Startup
@@ -26,6 +28,8 @@ public class AsyncMainService extends MainService {
     ExecutorPool executorPool;
     @Inject
     MysqlQueryCreator mysqlQueryCreator;
+    @Inject
+    PostgresQueryCreator postgresQueryCreator;
     @Inject
     MongoBsonCreator mongoBsonCreator;
 
@@ -106,9 +110,9 @@ public class AsyncMainService extends MainService {
         List<String> queries = new ArrayList<>();
         for (DatabaseEntry entry: entries) {
             if (database.upsertEntry(entry)) {
-                queries.add(mysqlQueryCreator.updateQuery(entry));
+                queries.add(postgresQueryCreator.updateQuery(entry));
             } else {
-                queries.add(mysqlQueryCreator.insertQuery(entry));
+                queries.add(postgresQueryCreator.insertQuery(entry));
             }
         }
         return queries;

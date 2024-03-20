@@ -9,10 +9,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
-import org.eclipse.microprofile.faulttolerance.Retry;
 
 import io.debezium.performance.dmt.dataSource.MysqlDataSource;
 import io.debezium.performance.dmt.exception.RuntimeSQLException;
@@ -20,10 +19,9 @@ import io.debezium.performance.dmt.queryCreator.MysqlQueryCreator;
 import io.quarkus.arc.Unremovable;
 import io.quarkus.arc.lookup.LookupIfProperty;
 
-@RequestScoped
+@Dependent
 @LookupIfProperty(name = "quarkus.datasource.mysql.enabled", stringValue = "true")
 @Unremovable
-@Retry
 public final class MysqlDao extends AbstractBasicDao {
 
     @Inject

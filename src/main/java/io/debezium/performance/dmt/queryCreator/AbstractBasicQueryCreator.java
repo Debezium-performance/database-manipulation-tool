@@ -39,9 +39,7 @@ public abstract class AbstractBasicQueryCreator implements QueryCreator {
         }
         builder.delete(builder.length() - 2, builder.length())
                 .append(")");
-        String query = builder.toString();
-        LOG.debug("Created INSERT query: " + query);
-        return query;
+        return builder.toString();
     }
 
     @Override
@@ -89,9 +87,7 @@ public abstract class AbstractBasicQueryCreator implements QueryCreator {
                 .append(databaseEntry.getPrimaryColumnEntry().value())
                 .append("'");
 
-        String query = builder.toString();
-        LOG.debug("Created UPDATE query: " + query);
-        return query;
+        return builder.toString();
     }
 
     @Override

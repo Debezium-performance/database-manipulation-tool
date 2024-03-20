@@ -9,16 +9,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.CDI;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import org.jboss.logging.Logger;
 
-@RequestScoped
+@Singleton
 public final class DaoManager {
     List<Dao> enabledDbs;
 
-    private static final Logger LOG = Logger.getLogger(DaoManager.class);
+    @Inject
+    Instance<MysqlDao> mysql;
+    @Inject
+    Instance<PostgresDao> postgres;
+    @Inject
+    Instance<MongoDao> mongo;
 
     public DaoManager() {
         enabledDbs = new ArrayList<>();
@@ -34,7 +40,17 @@ public final class DaoManager {
     }
 
     public List<Dao> getEnabledDbs() {
-        return enabledDbs;
+        List<Dao> returnList = new ArrayList<>();
+        if (postgres.isResolvable()) {
+            returnList.add(postgres.get());
+        }
+        if (mongo.isResolvable()) {
+            returnList.add(mongo.get());
+        }
+        if (mysql.isResolvable()) {
+            returnList.add(mysql.get());
+        }
+        return returnList;
     }
 
     public List<String> getEnabledDbsNames() {
@@ -46,5 +62,12 @@ public final class DaoManager {
         String daoName = dao.getClass().getSimpleName();
         String split = daoName.split("_")[0];
         return split.substring(0, split.length() - 3);
+    }
+
+    public MongoDao getMongoDao() {
+        if (mongo.isResolvable()) {
+            return mongo.get();
+        }
+        return null;
     }
 }

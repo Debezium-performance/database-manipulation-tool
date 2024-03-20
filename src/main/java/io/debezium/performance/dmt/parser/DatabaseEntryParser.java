@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache Software License version 2.0, available at http://www.apache.org/licenses/LICENSE-2.0
  */
-package io.debezium.performance.dmt.utils;
+package io.debezium.performance.dmt.parser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,13 +20,12 @@ import io.debezium.performance.dmt.model.DatabaseColumn;
 import io.debezium.performance.dmt.model.DatabaseColumnEntry;
 import io.debezium.performance.dmt.model.DatabaseEntry;
 import io.debezium.performance.dmt.model.DatabaseTableMetadata;
-import io.debezium.performance.dmt.service.MainService;
 
 @Deprecated
 @ApplicationScoped
 public class DatabaseEntryParser implements DataParser<DatabaseEntry, JsonObject> {
 
-    private static final Logger LOG = Logger.getLogger(MainService.class);
+    private static final Logger LOG = Logger.getLogger(DatabaseEntryParser.class);
 
     @Override
     public DatabaseEntry parse(JsonObject inputJsonObject) throws JsonException {

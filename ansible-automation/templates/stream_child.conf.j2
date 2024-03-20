@@ -1,0 +1,44 @@
+# netdata configuration for aggregating data from remote hosts
+#
+# API keys authorize a pair of sending-receiving netdata servers.
+# Once their communication is authorized, they can exchange metrics for any
+# number of hosts.
+#
+# You can generate API keys, with the linux command: uuidgen
+
+
+# -----------------------------------------------------------------------------
+# 1. ON CHILD NETDATA - THE ONE THAT WILL BE SENDING METRICS
+
+[stream]
+    # Enable this on child nodes, to have them send metrics.
+    enabled = yes
+    destination = {{ hostvars['masterNode'].ansible_host }}:19999
+
+    # The API_KEY to use (as the sender)
+    api key = {{ netdata_api_key }}
+
+    # Stream Compression
+    # The default is enabled
+    # You can control stream compression in this agent with options: yes | no
+    #enable compression = yes
+
+    # The timeout to connect and send metrics
+    timeout seconds = 60
+
+    # If the destination line above does not specify a port, use this
+    default port = 19999
+
+    # The buffer to use for sending metrics.
+    # 10MB is good for 60 seconds of data, so increase this if you expect latencies.
+    # The buffer is flushed on reconnects (this will not prevent gaps at the charts).
+    buffer size bytes = 10485760
+
+    # If the connection fails, or it disconnects,
+    # retry after that many seconds.
+    reconnect delay seconds = 5
+
+    # Sync the clock of the charts for that many iterations, when starting.
+    # It is ignored when replication is enabled
+    initial clock resync iterations = 60
+

@@ -8,6 +8,7 @@ package io.debezium.performance.dmt.resource;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.json.Json;
 import javax.json.JsonObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -18,14 +19,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import io.debezium.performance.dmt.schema.LoadResult;
+import io.debezium.performance.dmt.service.AsyncMainService;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
 import io.debezium.performance.dmt.model.DatabaseEntry;
-import io.debezium.performance.dmt.service.MainService;
-import io.debezium.performance.dmt.utils.DmtSchemaParser;
+import io.debezium.performance.dmt.parser.DmtSchemaJsonParser;
 import io.quarkus.runtime.StartupEvent;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import org.jboss.resteasy.reactive.RestQuery;
 
 @Path("Main")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -35,10 +39,10 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 public class MainResource {
 
     @Inject
-    MainService mainService;
+    AsyncMainService mainService;
 
     @Inject
-    DmtSchemaParser parser;
+    DmtSchemaJsonParser parser;
 
     @ConfigProperty(name = "onstart.reset.database", defaultValue = "false")
     boolean resetDatabase;
@@ -132,10 +136,74 @@ public class MainResource {
         }
     }
 
+    @Path("GenerateLoad")
+    @Consumes()
+    @POST
+    public Response generateLoad(@RestQuery int count, @RestQuery int maxRows) {
+        LOG.debug("Received generate load request");
+        if (count == 0|| maxRows == 0) {
+            return Response.noContent().status(Response.Status.BAD_REQUEST).build();
+        }
+        long start = System.currentTimeMillis();
+        long[] time = mainService.createAndExecuteLoad(count, maxRows);
+        long totalTime = System.currentTimeMillis() - start;
+        return generateLoadJsonResponse(totalTime, time[0], time[1]);
+    }
+
+    @Path("GenerateBatchLoad")
+    @Consumes()
+    @POST
+    public Response generateBatchLoad(@RestQuery int count, @RestQuery int maxRows) {
+        LOG.debug("Received generate load and use batch request");
+        if (count == 0|| maxRows == 0) {
+            return Response.noContent().status(Response.Status.BAD_REQUEST).build();
+        }
+        long start = System.currentTimeMillis();
+        long[] time = mainService.createAndExecuteBatchLoad(count, maxRows);
+        long totalTime = System.currentTimeMillis() - start;
+        return generateLoadJsonResponse(totalTime, time[0], time[1]);
+    }
+
+    @Path("GenerateMongoBulkSizedLoad")
+    @Consumes()
+    @POST
+    public Response generateMongoBulkSizedLoad(@RestQuery int count, @RestQuery int maxRows, @RestQuery int messageSize) {
+        LOG.debug("Received generate mongo bulk load with custom message size request");
+        if (count == 0|| maxRows == 0 || messageSize == 0) {
+            return Response.noContent().status(Response.Status.BAD_REQUEST).build();
+        }
+        long start = System.currentTimeMillis();
+        long time = mainService.createAndExecuteSizedMongoLoad(count, maxRows, messageSize);
+        long totalTime = System.currentTimeMillis() - start;
+        return generateLoadJsonResponse(totalTime, 0, time);
+    }
+    @Path("GenerateMongoBulkSizedLoadParallel")
+    @Consumes()
+    @POST
+    public Response generateMongoBulkSizedLoadParallel(@RestQuery int count, @RestQuery int maxRows, @RestQuery int messageSize) {
+        LOG.debug("Received generate mongo bulk load parallel with custom message size request");
+        if (count == 0|| maxRows == 0 || messageSize == 0) {
+            return Response.noContent().status(Response.Status.BAD_REQUEST).build();
+        }
+        long start = System.currentTimeMillis();
+        long time[] = mainService.createAndExecuteSizedMongoLoadParallel(count, maxRows, messageSize);
+        long totalTime = System.currentTimeMillis() - start;
+        return generateLoadJsonResponse(totalTime, time[0], time[1]);
+    }
+
     void onStart(@Observes StartupEvent ev) {
         if (resetDatabase) {
             LOG.info("Restarting database on startup");
             mainService.resetDatabase();
+        }
+    }
+
+    private Response generateLoadJsonResponse(long totalTime, long lastExecStart, long lastExecFinish) {
+        LoadResult loadResult = new LoadResult(totalTime, lastExecStart, lastExecFinish);
+        try {
+            return Response.ok().type(MediaType.APPLICATION_JSON).entity(loadResult.toJsonString()).build();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 }

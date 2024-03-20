@@ -1,0 +1,113 @@
+---
+- hosts: dmts
+  name: Deploying database manipulation tool
+  tasks:
+    - name: Set dnf appstream repository url to vault
+      become: true
+      yum_repository:
+        baseurl: "http://vault.centos.org/$contentdir/$releasever/AppStream/$basearch/os/"
+        name: AppStream
+        description: "CentOS-$releasever - AppStream"
+        file: "CentOS-AppStream"
+        gpgcheck: true
+        gpgkey: "file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial"
+      when: ansible_facts["distribution"] == "CentOS" and ansible_facts["distribution_major_version"] | int < 9
+
+    - name: Set dnf baseos repository url to vault
+      become: true
+      yum_repository:
+        baseurl: "http://vault.centos.org/$contentdir/$releasever/BaseOS/$basearch/os/"
+        name: BaseOS
+        description: "CentOS-$releasever - Base"
+        file: "CentOS-Base"
+        gpgcheck: true
+        gpgkey: "file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial"
+      when: ansible_facts["distribution"] == "CentOS" and ansible_facts["distribution_major_version"] | int < 9
+
+    - name: Set dnf baseos repository url to vault
+      become: true
+      yum_repository:
+        baseurl: "http://vault.centos.org/$contentdir/$releasever/extras/$basearch/os/"
+        name: extras
+        description: "CentOS-$releasever - Extras"
+        file: "CentOS-Extras"
+        gpgcheck: true
+        gpgkey: "file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial"
+      when: ansible_facts["distribution"] == "CentOS" and ansible_facts["distribution_major_version"] | int < 9
+
+    - name: Install git 
+      become: true
+      dnf:
+        name: git
+    
+#    - name: Install maven and openjdk 17
+#      become: true
+#      dnf:
+#        name: maven-openjdk17
+
+    - name: Install openjdk17
+      become: true
+      dnf:
+        name: java-17-openjdk-devel
+
+    - name: Create .m2 directory
+      file:
+        path: ~/.m2
+        state: directory
+
+    - name: Copy maven settings.xml for github authentication
+      template:
+        src: settings.xml.j2
+        dest: ~/.m2/settings.xml
+        
+    - name: Clone dmt 
+      git:
+        repo: "{{ dmt_repository }}"
+        version: "{{ dmt_branch }}"
+        dest: "~/database-manipulation-tool"
+        force: true
+
+    - name: Create jdbc connection string to mysql
+      set_fact: 
+        mysql_connection_string: "jdbc:mysql://{{ db_user }}:{{ db_password }}@{{ hostvars['mysql'].ansible_host }}:3306/{{ testing_database }}"
+      when: hostvars['mysql'].ansible_host != ""
+
+    - name: Set jdbc connection string variable in dmt properties
+      replace:
+        path: "~/database-manipulation-tool/src/main/resources/application.properties"
+        regexp: '^quarkus.datasource.mysql.jdbc.url=.*$'
+        replace: "quarkus.datasource.mysql.jdbc.url={{ mysql_connection_string }}"
+      when: hostvars['mysql'].ansible_host != ""
+
+    - name: Enable mysql datasource in dmt properties
+      replace:
+        path: "~/database-manipulation-tool/src/main/resources/application.properties"
+        regexp: '^quarkus.datasource.mysql.jdbc.enabled=.*$'
+        replace: "quarkus.datasource.mysql.enabled=true"
+      when: hostvars['mysql'].ansible_host != ""
+
+    - name: Create jdbc connection string to mongo
+      set_fact:
+        mongo_connection_string: "mongodb://{{ db_user }}:{{ db_password }}@{{ hostvars['mongo'].ansible_host }}:27017/?replicaSet=debezium-rs"
+      when: hostvars['mongo'].ansible_host != ""
+
+    - name: Set mongo connection string variable in dmt properties
+      replace:
+        path: "~/database-manipulation-tool/src/main/resources/application.properties"
+        regexp: '^quarkus.mongodb.main.connection-string=.*$'
+        replace: "quarkus.mongodb.main.connection-string={{ mongo_connection_string }}"
+      when: hostvars['mongo'].ansible_host != ""
+
+    - name: Enable mongo datasource in dmt properties
+      replace:
+        path: "~/database-manipulation-tool/src/main/resources/application.properties"
+        regexp: '^quarkus.mongodb.main.enabled=.*$'
+        replace: "quarkus.mongodb.main.enabled=true"
+      when: hostvars['mongo'].ansible_host != ""
+
+#      TODO: Add /etc/hosts aliases for mongo replicas
+
+    - name: Build DMT
+      command:
+        cmd: ./mvnw clean install
+        chdir: "~/database-manipulation-tool"

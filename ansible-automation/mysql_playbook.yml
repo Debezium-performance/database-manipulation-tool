@@ -1,0 +1,130 @@
+---
+- hosts: mysql
+  name: Deploying mysql server
+  tasks: 
+    - name: Install mysql-server
+      become: true
+      dnf:
+        name: mysql-server
+
+    - name: Start mysql
+      become: true
+      systemd:
+        name: mysqld
+        state: started
+        enabled: true
+      ignore_errors: "{{ ansible_check_mode }}"
+    
+    - name: Create mysql home directory
+      become: true
+      file:
+        path: /home/mysql
+        state: directory
+        owner: mysql
+        group: mysql
+        mode: '755'
+        recurse: true
+
+    - name: Change selinux context
+      become: true
+      community.general.sefcontext:
+        target: '/home/mysql(/.*)?'
+        setype: mysqld_db_t
+
+    - name: Apply selinux context
+      become: true
+      command: restorecon -Rv /home/mysql/
+
+    - name: Increase file descriptors limit
+      become: true
+      community.general.pam_limits:
+        value: 4096
+        limit_type: '-'
+        domain: '*'
+        limit_item: "nofile"
+    
+    - name: Calculate buffer size log 
+      set_fact: 
+        buffer_pool_size: "{{ (ansible_memtotal_mb*0.75)| int }}"
+        buffer_pool_size_gb: "{{ (ansible_memtotal_mb*0.75/1024)| int }}"
+
+    - name: Calculate File size and File group size
+      set_fact: 
+        log_file_size: "{% if buffer_pool_size_gb | int < 8 %}512{% elif buffer_pool_size_gb | int < 128 %}1024{% else %}2048{% endif %}"
+        log_files_in_group: "{% if buffer_pool_size_gb | int < 8 %}{{ buffer_pool_size_gb }}{% elif buffer_pool_size_gb | int < 128 %}{{ (buffer_pool_size_gb*0.75)| int }}{% else %}64{% endif %}"
+
+    - name: Create the mysql conf file from template
+      become: true
+      template: 
+        dest: /etc/my.cnf
+        src: my.cnf.j2
+      
+    - name: Restart mysql
+      become: true
+      systemd:
+        name: mysqld
+        state: restarted
+      ignore_errors: "{{ ansible_check_mode }}"
+
+    - name: Create socket symlink
+      become: true
+      file: 
+        state: link
+        force: true
+        src: /home/mysql/mysql.sock
+        dest: /var/lib/mysql/mysql.sock
+
+    - name: Install python3 mysqldb tools
+      become: true
+      dnf:
+        name: python3-PyMySQL
+
+
+    - name: Set mysql root password
+      become: true
+      community.mysql.mysql_user:
+        login_user: 'root'
+        login_password: ''
+        name: 'root'
+        password: "{{ db_password }}"
+        state: present
+      
+    - name: Fix remote root access
+      community.mysql.mysql_query:
+        login_user: 'root'
+        login_password: "{{ db_password }}"
+        query:
+        - GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost'
+        - UPDATE mysql.user SET host='%' WHERE user='root'
+
+    - name: Restart mysql
+      become: true
+      systemd:
+        name: mysqld
+        state: restarted
+      ignore_errors: "{{ ansible_check_mode }}"
+
+    - name: Create testing database
+      community.mysql.mysql_query:
+        login_user: 'root'
+        login_password: "{{ db_password }}"
+        query:
+        - CREATE DATABASE IF NOT EXISTS {{ testing_database }};
+
+    - name: Install tuned 
+      become: true
+      dnf:
+        name: tuned
+    
+    - name: Start tuned 
+      become: true
+      systemd:
+        name: tuned
+        state: started
+        enabled: true
+      ignore_errors: "{{ ansible_check_mode }}"
+    
+    - name: Set throughput-performance profile on tuned
+      become: true
+      command: tuned-adm profile throughput-performance
+        

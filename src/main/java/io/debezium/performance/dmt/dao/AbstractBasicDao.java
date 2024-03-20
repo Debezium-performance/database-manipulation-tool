@@ -6,12 +6,13 @@
 package io.debezium.performance.dmt.dao;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.Instant;
 import java.util.List;
 
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.Dependent;
 
 import org.jboss.logging.Logger;
 
@@ -23,7 +24,7 @@ import io.debezium.performance.dmt.model.DatabaseTableMetadata;
 import io.debezium.performance.dmt.queryCreator.QueryCreator;
 
 @SuppressWarnings("CdiManagedBeanInconsistencyInspection")
-@RequestScoped
+@Dependent
 public abstract class AbstractBasicDao implements Dao {
 
     protected DataSourceWrapper source;
@@ -48,7 +49,6 @@ public abstract class AbstractBasicDao implements Dao {
         catch (SQLException ex) {
             LOG.error("Could not insert into database " + databaseEntry);
             LOG.error(ex.getMessage());
-            throw new RuntimeSQLException(ex);
         }
     }
 
@@ -56,15 +56,11 @@ public abstract class AbstractBasicDao implements Dao {
     public void update(DatabaseEntry databaseEntry) {
         try (Connection conn = source.getConnection();
                 Statement stmt = conn.createStatement()) {
-            if (databaseEntry.getPrimaryColumnEntry() == null) {
-                throw new RuntimeException("Cannot update without primary key");
-            }
             stmt.execute(queryCreator.updateQuery(databaseEntry));
         }
         catch (Exception ex) {
             LOG.error("Could not update database " + databaseEntry);
             LOG.error(ex.getMessage());
-            throw new RuntimeSQLException(ex);
         }
     }
 
@@ -117,7 +113,7 @@ public abstract class AbstractBasicDao implements Dao {
     @Override
     public Instant timedInsert(DatabaseEntry databaseEntry) {
         try (Connection conn = source.getConnection();
-             Statement stmt = conn.createStatement()) {
+                Statement stmt = conn.createStatement()) {
             stmt.execute(queryCreator.insertQuery(databaseEntry));
             return Instant.now();
         }
@@ -125,6 +121,45 @@ public abstract class AbstractBasicDao implements Dao {
             LOG.error("Could not insert into database timed request" + databaseEntry);
             LOG.error(ex.getMessage());
             throw new RuntimeSQLException(ex);
+        }
+    }
+
+    @Override
+    public void executeStatement(String statement) {
+        try (Connection conn = source.getConnection();
+             Statement stmt = conn.createStatement()) {
+            stmt.execute(statement);
+        }
+        catch (SQLException ex) {
+            LOG.error("Could not execute statement " + statement);
+            LOG.error(ex.getMessage());
+        }
+    }
+
+    @Override
+    public void executePreparedStatement(String statement) {
+        try (Connection conn = source.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(statement)) {
+            stmt.executeUpdate();
+        }
+        catch (SQLException ex) {
+            LOG.error("Could not execute statement " + statement);
+            LOG.error(ex.getMessage());
+        }
+    }
+
+    @Override
+    public void executeBatchStatement(List<String> statements) {
+        try (Connection conn = source.getConnection();
+             Statement stmt = conn.createStatement()) {
+            for (int i = 1; i < statements.size(); i++) {
+                stmt.addBatch(statements.get(i));
+            }
+            stmt.executeBatch();
+        }
+        catch (SQLException ex) {
+            LOG.error("Could not execute batch statement " + statements.get(1) + " ...");
+            LOG.error(ex.getMessage());
         }
     }
 

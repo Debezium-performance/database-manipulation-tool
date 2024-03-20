@@ -1,0 +1,25 @@
+#
+# This group is read both both by the client and the server
+# use it for options that affect everything
+#
+[client-server]
+#
+# include all files from the config directory
+#
+!includedir /etc/my.cnf.d
+bind-address=0.0.0.0
+[client]
+socket=/home/mysql/mysql.sock
+[mysqld]
+datadir=/home/mysql/
+socket=/home/mysql/mysql.sock
+max_connections=1100
+innodb_buffer_pool_size={{ buffer_pool_size }}M
+innodb_log_file_size={{ log_file_size }}M
+innodb_log_files_in_group={{ log_files_in_group }}
+innodb_flush_method=O_DIRECT_NO_FSYNC
+#innodb_flush_neighbors=0
+#innodb_dedicated_server=ON
+
+
+

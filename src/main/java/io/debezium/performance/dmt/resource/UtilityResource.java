@@ -20,7 +20,7 @@ import org.jboss.logging.Logger;
 
 import io.debezium.performance.dmt.model.DatabaseEntry;
 import io.debezium.performance.dmt.service.UtilityService;
-import io.debezium.performance.dmt.utils.DmtSchemaParser;
+import io.debezium.performance.dmt.parser.DmtSchemaJsonParser;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @Path("Utility")
@@ -33,7 +33,7 @@ public class UtilityResource {
     UtilityService utilityService;
 
     @Inject
-    DmtSchemaParser parser;
+    DmtSchemaJsonParser parser;
 
     private static final Logger LOG = Logger.getLogger(UtilityResource.class);
 

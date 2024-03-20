@@ -1,0 +1,85 @@
+---
+- name: Install Netdata
+  hosts: netdataNodes
+  become: true
+  become_method: sudo
+
+  tasks:
+  - name: Download the installation script
+    get_url:
+      url: https://my-netdata.io/kickstart.sh
+      dest: ~/kickstart.sh
+      mode: +x
+
+  - name: Install Netdata
+    command: ~/kickstart.sh --dont-wait
+
+  - name: Cleanup installation script
+    file:
+      path: ~/kickstart.sh
+      state: absent
+
+- name: Configure Netdata Parent
+  hosts: netdataParent
+  become: true
+  become_method: sudo
+
+  tasks:
+  - name: Calculate disk space used for dbengine data
+    set_fact:
+        dbengine_multihost_disk_space: "{{ (ansible_mounts[0].size_available*0.5/1024/1024)| int }}"
+    when: dbengine_multihost_disk_space is undefined
+
+  - name: Copy netdata configuration
+    template:
+      src: ../templates/netdata_parent.conf.j2
+      dest: /etc/netdata/netdata.conf
+      owner: root
+      group: root
+      mode: u=wrx,g=rx,o=r,+x
+
+  - name: Copy stream configuration
+    template:
+      src: ../templates/stream_parent.conf.j2
+      dest: /etc/netdata/stream.conf
+      owner: root
+      group: root
+      mode: u=wrx,g=rx,o=r,+x
+    notify: Restart Netdata
+    become: true
+  
+  handlers:
+  - name: Restart Netdata
+    service:
+      name: netdata
+      state: restarted
+
+- name: Configure Netdata Children
+  hosts: netdata
+  become: true
+  become_method: sudo
+
+  tasks:
+  - name: Copy netdata configuration
+    template:
+      src: ../templates/netdata_child.conf.j2
+      dest: /etc/netdata/netdata.conf
+      owner: root
+      group: root
+      mode: u=wrx,g=rx,o=r,+x
+
+  - name: Copy stream configuration
+    template:
+      src: ../templates/stream_child.conf.j2
+      dest: /etc/netdata/stream.conf
+      owner: root
+      group: root
+      mode: u=wrx,g=rx,o=r,+x
+    notify: Restart Netdata
+    become: true
+  
+  handlers:
+  - name: Restart Netdata
+    service:
+      name: netdata
+      state: restarted

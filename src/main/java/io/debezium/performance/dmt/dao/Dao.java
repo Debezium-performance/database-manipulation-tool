@@ -28,6 +28,12 @@ public interface Dao {
 
     void resetDatabase();
 
+    void executeStatement(String statement);
+
+    void executePreparedStatement(String statement);
+
+    void executeBatchStatement(List<String> statements);
+
     Instant timedInsert(DatabaseEntry databaseEntry);
 
 }

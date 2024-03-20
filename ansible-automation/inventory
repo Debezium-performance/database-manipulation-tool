@@ -1,0 +1,35 @@
+[dbservers]
+mysql ansible_host= ansible_user=
+mongo ansible_host= ansible_user=
+
+[dmts]
+dmt ansible_host= ansible_user= 
+
+[netdataParent]
+masterNode ansible_host= ansible_user=
+
+[netdata:children]
+dbservers
+dmts
+
+[netdataNodes:children]
+netdata
+netdataParent
+
+[all:vars]
+db_user=
+db_password=
+testing_database=
+netdata_api_key=
+
+[dmts:vars]
+dmt_repository=https://github.com/Debezium-performance/database-manipulation-tool.git
+dmt_branch=Performance-edition
+git_username=
+git_token=
+
+[netdataParent:vars]
+# One metric generates 1 byte of data per second. We have about 9000 metrics enabled.
+# If this variable is not defined, Ansible will configure Netdata to use half of availiable disk space on Parent node.
+# This variable is in MB
+dbengine_multihost_disk_space=8192

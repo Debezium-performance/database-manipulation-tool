@@ -15,33 +15,30 @@ import javax.enterprise.context.ApplicationScoped;
 import org.jboss.logging.Logger;
 
 import io.debezium.performance.dmt.exception.InnerDatabaseException;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tags;
-import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.quarkus.arc.Lock;
 
 @Lock
 @ApplicationScoped
 public class Database {
-    private final MeterRegistry registry;
     Map<String, DatabaseTable> tables;
 
     private static final Logger LOG = Logger.getLogger(Database.class);
 
-    public Database(PrometheusMeterRegistry registry) {
+    public Database() {
         tables = new HashMap<>();
-        this.registry = registry;
-        registry.gaugeMapSize("table.count", Tags.empty(), tables);
     }
 
+    @Lock(value = Lock.Type.READ)
     public boolean tableExists(String name) {
         return tables.containsKey(name);
     }
 
+    @Lock(value = Lock.Type.READ)
     public DatabaseTable getTable(String name) {
         return tables.get(name);
     }
 
+    @Lock(value = Lock.Type.READ)
     public boolean entryExists(DatabaseEntry entry) {
         String tableName = entry.getDatabaseTableMetadata().getName();
         return tableExists(tableName) && getTable(tableName).rowExists(entry);
@@ -122,6 +119,5 @@ public class Database {
 
     private void createTable(DatabaseTableMetadata tableMetadata) {
         tables.put(tableMetadata.getName(), new DatabaseTable(tableMetadata));
-        registry.gaugeMapSize(tableMetadata.getName() + ".table.size", Tags.empty(), tables.get(tableMetadata.getName()).getRowsAsMap());
     }
 }

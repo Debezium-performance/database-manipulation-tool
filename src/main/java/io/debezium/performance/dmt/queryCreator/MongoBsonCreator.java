@@ -5,10 +5,18 @@
  */
 package io.debezium.performance.dmt.queryCreator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import com.mongodb.bulk.BulkWriteUpsert;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.UpdateOneModel;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.WriteModel;
+import io.debezium.performance.dmt.model.DatabaseColumnEntry;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.jboss.logging.Logger;
@@ -33,5 +41,22 @@ public class MongoBsonCreator {
         databaseEntry.getColumnEntries()
                 .forEach(columnEntry -> document.put(columnEntry.columnName(), columnEntry.value()));
         return document;
+    }
+
+    public List<WriteModel<Document>> bulkUpdateBson(List<DatabaseEntry> databaseEntries) {
+        List<WriteModel<Document>> bulkOperations = new ArrayList<>();
+        for (DatabaseEntry databaseEntry: databaseEntries) {
+            Bson filter = getPrimaryFilter(databaseEntry);
+            Bson update = updateBson(databaseEntry);
+            UpdateOptions options = new UpdateOptions().upsert(true);
+            UpdateOneModel<Document> updateOneModel = new UpdateOneModel<>(filter, update, options);
+            bulkOperations.add(updateOneModel);
+        }
+        return bulkOperations;
+    }
+
+    public Bson getPrimaryFilter(DatabaseEntry databaseEntry) {
+        DatabaseColumnEntry primary = databaseEntry.getPrimaryColumnEntry();
+        return Filters.eq(primary.columnName(), primary.value());
     }
 }

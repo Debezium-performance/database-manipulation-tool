@@ -1,0 +1,27 @@
+# Netdata configuration
+
+[global]
+  hostname = {{ inventory_hostname }}
+  memory mode = none
+
+[db]
+  # https://learn.netdata.cloud/docs/agent/database
+  # none = no retention, ram = some retention in ram
+  mode = none
+  # The retention in seconds.
+  # This provides some tolerance to the time the child has to find a parent in
+  # order to transfer the data. For IoT this can be lowered to 120.
+  retention = 120
+  # The granularity of metrics, in seconds.
+  # You may increase this to lower CPU resources.
+  update every = 1
+[ml]
+  # Disable Machine Learning
+  enabled = no
+[health]
+  # Disable Health Checks (Alerting)
+  enabled = no
+
+[web]
+  # local dashboard
+  mode = none

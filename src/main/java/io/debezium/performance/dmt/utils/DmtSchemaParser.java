@@ -20,12 +20,11 @@ import io.debezium.performance.dmt.model.DatabaseColumn;
 import io.debezium.performance.dmt.model.DatabaseColumnEntry;
 import io.debezium.performance.dmt.model.DatabaseEntry;
 import io.debezium.performance.dmt.model.DatabaseTableMetadata;
-import io.debezium.performance.dmt.service.MainService;
 
 @ApplicationScoped
 public class DmtSchemaParser implements DataParser<DatabaseEntry, JsonObject> {
 
-    private static final Logger LOG = Logger.getLogger(MainService.class);
+    private static final Logger LOG = Logger.getLogger(DmtSchemaParser.class);
 
     ObjectMapper objectMapper = new ObjectMapper();
 
